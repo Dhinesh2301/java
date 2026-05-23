@@ -1,134 +1,180 @@
 
-# EX 1A Print All Numbers 
-## DATE: 16/04/2026
-
+# EX 2A Assign Cookies using Greedy Algorithm. 
+## DATE: 20/04/2026
 ## AIM:
-To Write a Java program that takes an integer input N from the user and prints all the numbers from 1 to N, separated by spaces, on a single line..
+To Write a Java program for the following Constraints.
+Assume you are an awesome parent and want to give your children some cookies. But, you should give each child at most one cookie.
+
+Each child i has a greed factor g[i], which is the minimum size of a cookie that the child will be content with; and each cookie j has a size s[j]. If s[j] >= g[i], we can assign the cookie j to the child i, and the child i will be content. Your goal is to maximise the number of your content children and output the maximum number.
 
 ## Algorithm
-1.Start the program.
-
-2.Input an integer N from the user.
-
-3.Check condition:
-If N <= 0, display "Invalid input. N must be greater than 0." and stop.
-
-4.Initialize a variable i = 1.
-
-5.Use a loop to print numbers from 1 to N:
-
-While i <= N, print i followed by a space.
-
-Increment i by 1.
-
-End loop and stop the program. 
- 
+1. Start  
+2. Read the number of children `n` and input their greed factors into array `g`.  
+3. Read the number of cookies `m` and input their sizes into array `s`.  
+4. Sort both arrays `g` (children’s greed) and `s` (cookie sizes) in ascending order.  
+5. Initialize three variables:  
+   - `i = 0` → pointer for children  
+   - `j = 0` → pointer for cookies  
+   - `count = 0` → to count satisfied children  
+6. While both `i < g.length` and `j < s.length`:  
+   - If `s[j] >= g[i]`, assign the cookie to the child: increment both `i` and `j`, and increment `count`.  
+   - Else, increment `j` to check the next cookie.  
+7. When the loop ends, `count` holds the maximum number of satisfied children.  
+8. Print the value of `count`.  
+9. End  
+   
 
 ## Program:
 ```
 /*
-Program to implement Reverse a String
 Developed by: DHINESH R
 Register Number:  212223220019
-
 */
 
-import java.util.*; 
-public class demo   
-{
-    public static void main(String args[]) 
-    {
-        int N,i;
-        Scanner sc=new Scanner(System.in);
-        N=sc.nextInt();  
-        if(N<=0)
-        {
-            System.out.println("Invalid input. N must be greater than 0.");
-            
-        }
-        else{
-            for(i=1;i<=N;i++){
-                System.out.print(i+" ");    
+import java.util.*;
+
+public class AssignCookies {
+
+    public static int findContentChildren(int[] g, int[] s) {
+        Arrays.sort(g);
+        Arrays.sort(s);
+        
+        int i = 0;
+        int j = 0;
+        int count = 0;
+        
+        while (i < g.length && j < s.length) {
+            if (s[j] >= g[i]) {
+                count++;
+                i++;
+                j++;
+            } else {
+                j++;
             }
         }
-    }
-}
-```
-
-## Output:
-<img width="425" height="152" alt="image" src="https://github.com/user-attachments/assets/54163f54-8ab1-4383-ad7b-35428ac584b3" />
-
-
-
-## Result:
-The program successfully print all the numbers from 1 to N. 
-
-# EX 1B Power of 2
-## DATE: 17/04/2026
-
-## AIM:
-To write a Java program to for given constraints.Given an integer n, return true if it is a power of two. Otherwise, return false.
-
-An integer n is a power of two, if there exists an integer x such that n == 2x.
-
-## Algorithm
-1. Start the program.
-
-2.Read an integer input n from the user.
-
-3.Check if n is less than or equal to 0.
-
-4.If yes, return false (since powers of two are positive).
-
-5.Perform a bitwise AND operation between n and n - 1.
-
-6.If the result is 0, then n is a power of two (only one bit is set in its binary form).
-
-7.Otherwise, it is not a power of two.
-
-8.Display the result (true or false) to the user. 
-
-## Program:
-```
-/*
-Program to implement Reverse a String
-Developed by: DHINESH R
-Register Number:  212223220019
-
-import java.util.Scanner;
-
-public class Solution {
-
-    public boolean isPowerOfTwo(int n) {
-        if (n <= 0) {
-            return false;
-        }
-        return (n & (n - 1)) == 0; 
+        
+        return count;
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Solution sol = new Solution();
-        int n = scanner.nextInt();
-
-        boolean result = sol.isPowerOfTwo(n);
-        System.out.println(result);
-
-        scanner.close();
+        Scanner sc = new Scanner(System.in);
+        
+        int n = sc.nextInt();
+        int[] g = new int[n];
+        for (int i = 0; i < n; i++) g[i] = sc.nextInt();
+        
+        int m = sc.nextInt();
+        int[] s = new int[m];
+        for (int i = 0; i < m; i++) s[i] = sc.nextInt();
+        
+        System.out.println(findContentChildren(g, s));
     }
 }
 
-*/
 ```
 
 ## Output:
-<img width="510" height="230" alt="image" src="https://github.com/user-attachments/assets/d4f55e9f-2f7c-423e-bcff-73dc3303fa4c" />
+
+<img width="649" height="469" alt="image" src="https://github.com/user-attachments/assets/7c99b307-ae12-415e-b466-f1d82522c440" />
+
+
+## Result:
+The program successfully implemented and the expected output is verified.. 
+
+# EX 2B Jump Game using Greedy Algorithm.
+## DATE: 20/04/2026
+## AIM:
+To write a Java program to for given constraints.
+You are given an array of integers. Each number represents the maximum number of steps you can jump forward from that position.
+
+You start from the first element (index 0). 
+Write a program to find the minimum number of jumps required to reach the last index of the array.
+
+If it is not possible to reach the end, return -1.
+## Algorithm
+1. Start  
+2. Read the integer `n` (size of the array) and input `n` elements into array `nums`.  
+3. If the array is empty, return `-1`. If it has only one element, return `0` (no jumps needed).  
+4. Initialize variables:  
+   - `jumps = 0` → counts the number of jumps made.  
+   - `currentEnd = 0` → the farthest index reachable with the current number of jumps.  
+   - `farthest = 0` → the farthest index reachable overall so far.  
+5. Loop through the array from index `0` to `nums.length - 2`:  
+   - Update `farthest = max(farthest, i + nums[i])`.  
+   - If the current index `i` equals `currentEnd`, increment `jumps` and set `currentEnd = farthest`.  
+   - If `currentEnd` reaches or exceeds the last index, return `jumps` (we can reach the end).  
+   - If `i >= farthest`, return `-1` (cannot move further).  
+6. After the loop, if the end is not reached, return `-1`.  
+7. Print the minimum number of jumps required to reach the end of the array.  
+8. End  
+   
+
+## Program:
+```
+/*
+Developed by: DHINESH R
+Register Number:  212223220019
+*/
+import java.util.Scanner;
+
+public class MinJumpToEnd {
+
+    
+    public static int minimumJumps(int[] nums) {
+        if (nums == null || nums.length == 0) return -1;
+        if (nums.length == 1) return 0; 
+
+        int jumps = 0;
+        int currentEnd = 0;
+        int farthest = 0;
+
+        for (int i = 0; i < nums.length - 1; i++) {
+            farthest = Math.max(farthest, i + nums[i]);
+
+          
+            if (i == currentEnd) {
+                jumps++;
+                currentEnd = farthest;
+
+                if (currentEnd >= nums.length - 1) {
+                    return jumps; 
+                }
+            }
+
+            if (i >= farthest) { 
+                return -1;
+            }
+        }
+
+        return -1; 
+    }
+
+    
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int[] nums = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            nums[i] = sc.nextInt();
+        }
+
+        System.out.println("Minimum jumps to reach last index: " + minimumJumps(nums));
+    }
+}
+
+```
+
+## Output:
+
+<img width="1105" height="445" alt="image" src="https://github.com/user-attachments/assets/9643b55b-9541-4bcd-9ac7-9b4a1b21ceef" />
+
 
 ## Result:
 The program successfully implemented and the expected output is verified.
 
-# EX 1C Valid Pairs using Brute Force Approach
-## DATE:17/04/2026
+# EX 2C Job Sequencing using Greedy Approach
+## DATE : 22/04/2026
 ## AIM:
 To write a Java program to for given constraints.
 Given an integer array nums and an integer k, return the number of pairs (i, j) where i < j such that |nums[i] - nums[j]| == k.
@@ -136,58 +182,284 @@ Given an integer array nums and an integer k, return the number of pairs (i, j) 
 The value of |x| is defined as:
 
 x if x >= 0.
--x if x < 0.
+-x if x < 0.You're given N jobs, each with:
+
+A unique jobId
+
+A deadline (by which it must be completed)
+
+A profit (earned only if completed on or before the deadline)
+
+Each job:
+
+Takes exactly 1 unit of time
+
+Only one job can be done at a time
+
+Your goal is to maximize total profit while completing the maximum number of jobs possible within their deadlines.
 
 ## Algorithm
-1.Start the program.
-
-2.Input the size of the array n, the n array elements, and an integer k.
-
-3.Initialize a counter variable count = 0.
-
-4.Compare each pair of elements:
-
-Use two loops:
-For each i from 0 to n-1,
-and for each j from i+1 to n-1,
-check if the absolute difference |nums[i] - nums[j]| == k.
-
-If true, increment count by 1.
-
-5.Display the total count of such pairs and stop the program. 
+1. Start  
+2. Read the integer `n` (number of jobs).  
+3. For each job, input three values — `id`, `deadline`, and `profit` — and store them in an array of `Job` objects.  
+4. Sort the jobs in **descending order of profit** using a custom comparator.  
+5. Find the maximum deadline among all jobs to determine the total number of available time slots.  
+6. Create a boolean array `slot[]` of size `maxDeadline + 1` to track which time slots are filled.  
+7. Initialize `totalProfit = 0` and `countJobs = 0`.  
+8. For each job in the sorted list:  
+   - Check from its deadline down to 1 to find a free slot.  
+   - If a free slot is found, mark it as occupied (`slot[j] = true`).  
+   - Add the job’s profit to `totalProfit` and increment `countJobs`.  
+9. After scheduling all possible jobs, return the total number of jobs done (`countJobs`) and the total profit (`totalProfit`).  
+10. Print both values.  
+11. End  
+  
 
 ## Program:
 ```
 /*
-Program to implement Reverse a String
+Developed by: DHINESH R
+Register Number:  212223220019
+*/
+import java.util.*;
+
+public class JobScheduling {
+
+    static class Job {
+        int id, deadline, profit;
+
+        Job(int id, int deadline, int profit) {
+            this.id = id;
+            this.deadline = deadline;
+            this.profit = profit;
+        }
+    }
+
+    public static int[] jobScheduling(Job[] jobs, int n) {
+        Arrays.sort(jobs, (a, b) -> b.profit - a.profit);
+
+        int maxDeadline = 0;
+        for (Job job : jobs) {
+            maxDeadline = Math.max(maxDeadline, job.deadline);
+        }
+
+        boolean[] slot = new boolean[maxDeadline + 1];
+        int totalProfit = 0;
+        int countJobs = 0;
+
+        for (Job job : jobs) {
+            for (int j = job.deadline; j > 0; j--) {
+                if (!slot[j]) {
+                    slot[j] = true;
+                    totalProfit += job.profit;
+                    countJobs++;
+                    break;
+                }
+            }
+        }
+
+        return new int[]{countJobs, totalProfit};
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        Job[] jobs = new Job[n];
+
+        for (int i = 0; i < n; i++) {
+            int id = sc.nextInt();
+            int deadline = sc.nextInt();
+            int profit = sc.nextInt();
+            jobs[i] = new Job(id, deadline, profit);
+        }
+
+        int[] result = jobScheduling(jobs, n);
+        System.out.println(result[0] + " " + result[1]);
+    }
+}
+
+```
+
+## Output:
+
+<img width="821" height="551" alt="image" src="https://github.com/user-attachments/assets/e59960d0-7182-4f2a-bead-6f588a1329ba" />
+
+
+## Result:
+The program successfully implemented and the expected output is verified.
+# EX 2D Pattern Matching using Naive Approach.
+## DATE : 22/04/2026
+
+## AIM:
+To write a Java program to for given constraints.
+Given text string with length n and a pattern with length m, the task is to prints all occurrences of pattern in text.
+Note: You may assume that n > m.
+
+Examples: 
+
+Input:  text = "THIS IS A TEST TEXT", pattern = "TEST"
+Output: Pattern found at index 10
+
+Input:  text =  "AABAACAADAABAABA", pattern = "AABA"
+Output: Pattern found at index 0, Pattern found at index 9, Pattern found at index 12
+## Algorithm
+1. Start  
+2. Read the input string `text` and the `pattern` to be searched.  
+3. Find the lengths of both strings:  
+   - `n = length of text`  
+   - `m = length of pattern`  
+4. Loop through the text from index `i = 0` to `i <= n - m`:  
+   - For each position `i`, compare every character of the pattern with the corresponding character in the text.  
+   - If any character does not match, break out of the inner loop.  
+5. If all characters of the pattern match (`j == m`), print the index `i` where the pattern starts in the text.  
+6. Continue checking until the end of the text.  
+7. End  
+ 
+
+## Program:
+```
+/*
 Developed by: DHINESH R
 Register Number:  212223220019
 */
 import java.util.Scanner;
-public class CountPairsWithDifference {
-    public static int countKDifference(int[] nums, int k) {
-        //Type your code here
-        int count=0;
-        for(int i=0;i<nums.length;i++){
-            for(int j=i+1;j<nums.length;j++){
-                if(Math.abs(nums[i]-nums[j])==k){
-                    count++;
+
+public class NaivePatternSearch {
+
+    public static void search(String text, String pattern) {
+        int n = text.length();
+        int m = pattern.length();
+
+        for (int i = 0; i <= n - m; i++) {
+            int j;
+            for (j = 0; j < m; j++) {
+                if (text.charAt(i + j) != pattern.charAt(j)) {
+                    break;
                 }
             }
-            
+            if (j == m) {
+                System.out.println("Pattern found at index " + i);
+            }
         }
-        return count;
     }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        //System.out.print("Enter the text: ");
+        String text = scanner.nextLine();
+
+        //System.out.print("Enter the pattern: ");
+        String pattern = scanner.nextLine();
+
+        search(text, pattern);
+
+        scanner.close();
+    }
+}
+
+```
+
+## Output:
+
+<img width="1042" height="411" alt="image" src="https://github.com/user-attachments/assets/4fbde6a2-3110-4802-8d7e-116d13020d3d" />
+
+
+## Result:
+The program successfully implemented and the expected output is verified.
+
+# EX 2E Pattern Matching using Manacher's Algorithm.
+## DATE : 24/04/2026
+
+## AIM:
+To write a Java program for the following constraints.
+Longest Palindromic Substring
+Given a string s, return the longest palindromic substring in s.
+using Manacher's Algorithm
+
+## Algorithm
+1. Start  
+2. Read the input string `s`.  
+3. If the string is empty, return an empty result.  
+4. Preprocess the string by inserting a special character (e.g., `#`) between each letter and at both ends to handle even-length palindromes uniformly.  
+   - Example: `"abba"` → `"#a#b#b#a#"`  
+5. Initialize variables:  
+   - `p[]` → array to store palindrome radii centered at each position  
+   - `center = 0` and `right = 0` → current center and right boundary of the known palindrome  
+   - `maxLen = 0` and `centerIndex = 0` → track longest palindrome found so far  
+6. For each position `i` in the processed string:  
+   - Find the mirror position: `mirror = 2 * center - i`  
+   - If `i < right`, set `p[i] = min(right - i, p[mirror])`.  
+   - Expand around `i` while characters on both sides match (`t[a] == t[b]`).  
+   - Update `p[i]` for every successful expansion.  
+7. If `i + p[i] > right`, update `center = i` and `right = i + p[i]`.  
+8. If `p[i] > maxLen`, update `maxLen` and `centerIndex`.  
+9. Compute the starting index of the palindrome in the original string:  
+   - `start = (centerIndex - maxLen) / 2`  
+10. Extract and return the substring from `start` to `start + maxLen`.  
+11. Print the longest palindromic substring.  
+12. End  
+
+
+## Program:
+```
+/*
+Developed by:DHINESH R
+Register Number:  212223220019
+*/
+import java.util.Scanner;
+
+public class LongestPalindromeManacher {
+
+    public static String longestPalindrome(String s) {
+        if (s == null || s.length() == 0) return "";
+
+        StringBuilder t = new StringBuilder();
+        t.append('#');
+        for (int i = 0; i < s.length(); i++) {
+            t.append(s.charAt(i));
+            t.append('#');
+        }
+
+        int n = t.length();
+        int[] p = new int[n];
+        int center = 0, right = 0;
+        int maxLen = 0, centerIndex = 0;
+
+        for (int i = 0; i < n; i++) {
+            int mirror = 2 * center - i;
+            if (i < right) {
+                p[i] = Math.min(right - i, p[mirror]);
+            }
+
+            int a = i + (1 + p[i]);
+            int b = i - (1 + p[i]);
+            while (a < n && b >= 0 && t.charAt(a) == t.charAt(b)) {
+                p[i]++;
+                a++;
+                b--;
+            }
+
+            if (i + p[i] > right) {
+                center = i;
+                right = i + p[i];
+            }
+
+            if (p[i] > maxLen) {
+                maxLen = p[i];
+                centerIndex = i;
+            }
+        }
+
+        int start = (centerIndex - maxLen) / 2;
+        return s.substring(start, start + maxLen);
+    }
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        int[] nums = new int[n];
-        for (int i = 0; i < n; i++) {
-            nums[i] = sc.nextInt();
-        }
-        int k = sc.nextInt();
-        int result = countKDifference(nums, k);
-        System.out.println(result);
+        String input = sc.nextLine();
+        String result = longestPalindrome(input);
+        System.out.println("Longest Palindromic Substring: " + result);
         sc.close();
     }
 }
@@ -196,285 +468,8 @@ public class CountPairsWithDifference {
 
 ## Output:
 
-<img width="396" height="290" alt="image" src="https://github.com/user-attachments/assets/71cc1b06-d4e6-422a-8707-63a95b3a879b" />
+<img width="1266" height="391" alt="image" src="https://github.com/user-attachments/assets/c9ecddb8-7f68-427c-b22f-0149833458aa" />
 
-## Result:
-The program successfully implemented and the expected output is verified.
-
-# EX 1D Sorted Array using Divide and Conquer Approach.
-## DATE:17/04/2026
-
-## AIM:
-To write a Java program to for given constraints.
-Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.
-
-The overall run time complexity should be O(log (m+n)).
-
-## Algorithm
-1.Start the program.
-Read the sizes of two sorted arrays m and n, then input the elements of both arrays nums1 and nums2.
-
-2.Initialize two pointers p1 = 0 and p2 = 0 to traverse both arrays.
-
-3.Use a helper function getMin() to return the smaller of the current elements from both arrays and move the corresponding pointer forward.
-
-4.Find the median:
-
-If the total number of elements (m + n) is even, skip (m + n)/2 - 1 elements, then take the average of the next two smallest elements as the median.
-
-If (m + n) is odd, skip (m + n)/2 elements, then take the next smallest element as the median.
-
-5.Display the computed median and stop the program.  
-
-## Program:
-```
-/*
-Program to implement Reverse a String
-Developed by: DHINESH R
-Register Number:  212223220019
-
-*/
-
-import java.util.Scanner;
-
-public class Solution {
-    private int p1 = 0, p2 = 0;
-
-    // Get the smaller value between nums1[p1] and nums2[p2], and move the pointer forward
-    private int getMin(int[] nums1, int[] nums2) {
-        if (p1 < nums1.length && p2 < nums2.length) {
-            return nums1[p1] < nums2[p2] ? nums1[p1++] : nums2[p2++];
-        } else if (p1 < nums1.length) {
-            return nums1[p1++];
-        } else if (p2 < nums2.length) {
-            return nums2[p2++];
-        }
-        return -1; // Should not reach here if input is valid
-    }
-
-    // Main logic to find median of two sorted arrays
-    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-       //Type code here...
-       int m=nums1.length,n=nums2.length;
-       if((m+n)%2==0){
-           for(int i=0;i<(m+n)/2-1;++i){
-               int tmp=getMin(nums1,nums2);
-           }
-           return (double) (getMin(nums1,nums2)+getMin(nums1,nums2))/2;
-       }
-       else{
-           for(int i=0;i<(m+n)/2;++i){
-               int tmp=getMin(nums1,nums2);
-           }
-           return getMin(nums1,nums2);
-       }
-    }
-
-    // Main method with user input
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        Solution sol = new Solution();
-
-        // Input for nums1
-        //System.out.print("Enter size of first sorted array: ");
-        int m = sc.nextInt();
-        int[] nums1 = new int[m];
-        //System.out.println("Enter " + m + " sorted integers for first array:");
-        for (int i = 0; i < m; i++) {
-            nums1[i] = sc.nextInt();
-        }
-
-        // Input for nums2
-        //System.out.print("Enter size of second sorted array: ");
-        int n = sc.nextInt();
-        int[] nums2 = new int[n];
-        //System.out.println("Enter " + n + " sorted integers for second array:");
-        for (int i = 0; i < n; i++) {
-            nums2[i] = sc.nextInt();
-        }
-
-        // Find and display the median
-        double median = sol.findMedianSortedArrays(nums1, nums2);
-        System.out.println("Median of the two sorted arrays = " + median);
-        
-        sc.close();
-    }
-}
-
-```
-
-## Output:
-<img width="883" height="330" alt="image" src="https://github.com/user-attachments/assets/d430c9c0-0455-4220-811f-1a6ab58b32f7" />
-
-## Result:
-The program successfully implemented and the expected output is verified.
-# EX 1E Integer Multiplication using Divide and Conquer Approach(Strassen’s algorithm).
-## DATE:17/04/2026
-
-
-## AIM:
-To write a Java program to for given constraints.
-You are given two square matrices A and B of size n × n (where n is a power of 2). Your task is to compute their matrix product using Strassen’s Matrix Multiplication algorithm and return the resulting matrix.
-
-Unlike traditional matrix multiplication which takes O(n3)O(n^3)O(n3) time, Strassen’s algorithm improves this by reducing the number of recursive multiplications from 8 to 7, achieving approximately O(n2.81)O(n^{2.81})O(n2.81) complexity.
-## Algorithm
-1.Start the program.
-Read the size n (power of 2) and input two n × n matrices A and B.
-
-2.Divide each matrix into four submatrices:
-A11, A12, A21, A22 and B11, B12, B21, B22, each of size (n/2) × (n/2).
-
-3.Compute seven intermediate products (M1 to M7) using Strassen’s formulas:
-
-M1 = (A11 + A22) × (B11 + B22)
-M2 = (A21 + A22) × B11
-M3 = A11 × (B12 - B22)
-M4 = A22 × (B21 - B11)
-M5 = (A11 + A12) × B22
-M6 = (A21 - A11) × (B11 + B12)
-M7 = (A12 - A22) × (B21 + B22)
-
-
-4.Combine the results to form the resulting submatrices:
-
-C11 = M1 + M4 - M5 + M7  
-C12 = M3 + M5  
-C21 = M2 + M4  
-C22 = M1 + M3 - M2 + M6
-
-
-Then merge C11, C12, C21, C22 to get the final matrix C.
-
-5.Display the resultant matrix C as the product of A and B, and stop the program. 
-
-
-## Program:
-```
-/*
-Program to implement Reverse a String
-Developed by: DHINESH R
-Register Number:  212223220019
-*/
-
-import java.util.Scanner;
-
-public class StrassenMatrix {
-
-    // Add two matrices
-    static int[][] add(int[][] A, int[][] B) {
-        int n = A.length;
-        int[][] C = new int[n][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                C[i][j] = A[i][j] + B[i][j];
-        return C;
-    }
-
-    // Subtract matrix B from A
-    static int[][] subtract(int[][] A, int[][] B) {
-        int n = A.length;
-        int[][] C = new int[n][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                C[i][j] = A[i][j] - B[i][j];
-        return C;
-    }
-
-    // Strassen recursive multiplication
-    static int[][] strassen(int[][] A, int[][] B) {
-        //Type code here...
-        int n = A.length;
-        int[][] C = new int[n][n];
-        if (n == 1) {
-            C[0][0] = A[0][0] * B[0][0];
-            return C;
-        }
-        int mid =n/2;
-        int[][] A11 = new int[mid][mid],A12 = new int[mid][mid],A21 = new int[mid][mid], A22 = new int[mid][mid];
-        int[][] B11 = new int[mid][mid],B12 = new int[mid][mid], B21 = new int[mid][mid],B22 = new int[mid][mid];
-        for (int i=0;i<mid;i++){
-            for(int j=0;j<mid;j++) {
-                A11[i][j] = A[i][j];
-                A12[i][j] = A[i][j+mid];
-                A21[i][j] = A[i+mid][j];
-                A22[i][j] = A[i+mid][j+mid];
-                B11[i][j] = B[i][j];
-                B12[i][j] = B[i][j+mid];
-                B21[i][j] = B[i+mid][j];
-                B22[i][j] = B[i+mid][j+mid];
-            }
-        }
-                
-            int[][] M1 =strassen(add(A11,A22),add(B11,B22));
-            int[][] M2 =strassen(add(A21,A22),B11);
-            int[][] M3 =strassen(A11,subtract(B12,B22));
-            int[][] M4 =strassen(A22,subtract(B21,B11));
-            int[][] M5 =strassen(add(A11,A12),B22);
-            int[][] M6 =strassen(subtract(A21,A11),add(B11,B12));
-            int[][] M7 =strassen(subtract(A12,A22),add(B21,B22));
-            int[][] C11 = add(subtract(add(M1,M4),M5),M7);
-            int[][] C12 = add(M3,M5);
-            int[][] C21 = add(M2,M4);
-            int[][] C22 = add(subtract(add(M1,M3),M2),M6);
-            for (int i=0; i<mid;i++){
-                for (int j=0;j<mid;j++) {
-                    C[i][j] = C11[i][j];
-                    C[i][j+mid] = C12[i][j];
-                    C[i+mid][j] = C21[i][j];
-                    C[i+mid][j+mid] = C22[i][j];
-                }
-            }
-        
-                return C;
-            }
-        
-        
-    
-
-    // Function to print matrix
-    static void printMatrix(int[][] matrix) {
-        for (int[] row : matrix) {
-            for (int val : row)
-                System.out.print(val + " ");
-            System.out.println();
-        }
-    }
-
-    // Main method to get input and run Strassen multiplication
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        // Read size of matrix
-        //System.out.print("Enter matrix size (power of 2): ");
-        int n = sc.nextInt();
-
-        int[][] A = new int[n][n];
-        int[][] B = new int[n][n];
-
-        // Input Matrix A
-        //System.out.println("Enter elements of matrix A:");
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                A[i][j] = sc.nextInt();
-
-        // Input Matrix B
-        //System.out.println("Enter elements of matrix B:");
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                B[i][j] = sc.nextInt();
-
-        // Multiply using Strassen
-        int[][] result = strassen(A, B);
-
-        // Output the result matrix
-        System.out.println("Result of Strassen Matrix Multiplication:");
-        printMatrix(result);
-    }
-}
-```
-
-## Output:
-<img width="493" height="432" alt="image" src="https://github.com/user-attachments/assets/b8057f32-f7ff-4854-82cd-d9fa62ee8073" />
 
 ## Result:
 The program successfully implemented and the expected output is verified.
