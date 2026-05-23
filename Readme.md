@@ -1,26 +1,164 @@
 
-# EX 2A Assign Cookies using Greedy Algorithm. 
-## DATE: 20/04/2026
+# EX 3A N Queens Problem - Backtracking Approach.
+## DATE: 01/05/2026
 ## AIM:
-To Write a Java program for the following Constraints.
-Assume you are an awesome parent and want to give your children some cookies. But, you should give each child at most one cookie.
+To Write a Java program for N queens using backtracking approach.
+You are given an integer N. For a given N x N chessboard, find a way to place 'N' queens such that no queen can attack any other queen on the chessboard.
+A queen can be attacked when it lies in the same row, column, or the same diagonal as any of the other queens. You have to print one such configuration.
+Chess Board
+<img width="241" height="209" alt="image" src="https://github.com/user-attachments/assets/96aacb61-4f34-423f-b324-5e34454e42b8" />
 
-Each child i has a greed factor g[i], which is the minimum size of a cookie that the child will be content with; and each cookie j has a size s[j]. If s[j] >= g[i], we can assign the cookie j to the child i, and the child i will be content. Your goal is to maximise the number of your content children and output the maximum number.
+
+Note :
+
+Get the input from the user for N . The value of N must be from 1 to 4
+
+If solution exists Print a binary matrix as output that has 1s for the cells where queens are placed
+
+If there is no solution to the problem  print  "Solution does not exist"
 
 ## Algorithm
 1. Start  
-2. Read the number of children `n` and input their greed factors into array `g`.  
-3. Read the number of cookies `m` and input their sizes into array `s`.  
-4. Sort both arrays `g` (children’s greed) and `s` (cookie sizes) in ascending order.  
-5. Initialize three variables:  
-   - `i = 0` → pointer for children  
-   - `j = 0` → pointer for cookies  
-   - `count = 0` → to count satisfied children  
-6. While both `i < g.length` and `j < s.length`:  
-   - If `s[j] >= g[i]`, assign the cookie to the child: increment both `i` and `j`, and increment `count`.  
-   - Else, increment `j` to check the next cookie.  
-7. When the loop ends, `count` holds the maximum number of satisfied children.  
-8. Print the value of `count`.  
+2. Read the integer `N` — the size of the chessboard and the number of queens to be placed.  
+3. Initialize an `N × N` chessboard with all cells set to `0`.  
+4. Define a recursive function `solveNQUtil(board, col)` to place queens one column at a time:  
+   - If `col >= N`, all queens are placed successfully → return `true`.  
+   - For each row `i` in column `col`:  
+     - Check if placing a queen at `(i, col)` is safe using the `isSafe()` function.  
+     - If safe:  
+       - Place a queen (`board[i][col] = 1`).  
+       - Recursively call `solveNQUtil(board, col + 1)` to place the rest.  
+       - If successful, return `true`.  
+       - If not, backtrack (`board[i][col] = 0`).  
+   - If no safe position is found in this column, return `false`.  
+5. The `isSafe()` function checks if a queen can be placed at position `(row, col)` by verifying:  
+   - No other queen exists in the same row on the left.  
+   - No other queen exists in the upper-left diagonal.  
+   - No other queen exists in the lower-left diagonal.  
+6. If the recursive function returns `false`, print “Solution does not exist.”  
+7. If successful, print the board configuration where `1` indicates a queen’s position.  
+8. End  
+   
+
+## Program:
+```
+/*
+
+Developed by: DHINESH R
+Register Number:  212223220019
+*/
+import java.util.Scanner;
+
+public class NQueens {
+    static int N;
+
+    static void printSolution(int[][] board) {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    static boolean isSafe(int[][] board, int row, int col) {
+        for (int i = 0; i < col; i++)
+            if (board[row][i] == 1)
+                return false;
+
+        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--)
+            if (board[i][j] == 1)
+                return false;
+
+        for (int i = row, j = col; i < N && j >= 0; i++, j--)
+            if (board[i][j] == 1)
+                return false;
+
+        return true;
+    }
+
+    static boolean solveNQUtil(int[][] board, int col) {
+        if (col >= N)
+            return true;
+
+        for (int i = 0; i < N; i++) {
+            if (isSafe(board, i, col)) {
+                board[i][col] = 1;
+
+                if (solveNQUtil(board, col + 1))
+                    return true;
+
+                board[i][col] = 0;
+            }
+        }
+        return false;
+    }
+
+    static boolean solveNQ() {
+        int[][] board = new int[N][N];
+
+        if (!solveNQUtil(board, 0)) {
+            System.out.println("Solution does not exist");
+            return false;
+        }
+
+        printSolution(board);
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        N = scanner.nextInt();
+        solveNQ();
+    }
+}
+
+```
+
+## Output:
+
+<img width="811" height="404" alt="image" src="https://github.com/user-attachments/assets/64584491-f648-4f9a-8803-0c1f5026f1ef" />
+
+
+## Result:
+The program successfully implemented and the ouput is verified. 
+
+# EX 3B Rat in Maze- Backtracking 
+## DATE : 01/05/2026
+## AIM:
+To write a Java program to for given constraints.
+here is a ball in a maze with empty spaces (represented as 0) and walls (represented as 1). The ball can go through the empty spaces by rolling up, down, left or right, but it won't stop rolling until hitting a wall. When the ball stops, it could choose the next direction.
+
+Given the m x n maze, the ball's start position and the destination, where start = [startrow, startcol] and destination = [destinationrow, destinationcol], return true if the ball can stop at the destination, otherwise return false.
+
+You may assume that the borders of the maze are all walls (see examples).
+<img width="573" height="573" alt="image" src="https://github.com/user-attachments/assets/d6f1c054-cdc2-4bb3-9c55-512fb2cf0fb7" />
+Input: maze = [[0,0,1,0,0],[0,0,0,0,0],[0,0,0,1,0],[1,1,0,1,1],[0,0,0,0,0]], start = [0,4], destination = [4,4]
+Output: true
+Explanation: One possible way is : left -> down -> left -> down -> right -> down -> right.
+
+
+## Algorithm
+1. Start  
+2. Read the dimensions of the maze: `m` (rows) and `n` (columns).  
+3. Read the maze as a 2D grid of size `m × n`, where:  
+   - `0` represents an open path  
+   - `1` represents a wall  
+4. Read the starting position `start[]` and the destination position `destination[]`.  
+5. Initialize a 2D boolean array `visit[m][n]` to track visited cells.  
+6. Define a recursive function `dfs(m, n, maze, curr, destination, visit)` that:  
+   - Returns `false` if the current cell is already visited.  
+   - Returns `true` if the current cell equals the destination cell.  
+   - Marks the current cell as visited.  
+   - Defines four movement directions: up, down, left, right.  
+   - For each direction:  
+     - Move continuously (roll) in that direction until hitting a wall (`1`) or the boundary of the maze.  
+     - Once stopped, recursively call `dfs()` from the stopping position.  
+     - If any recursive call returns `true`, propagate success upward.  
+7. In the `hasPath()` function:  
+   - Initialize parameters and call the DFS function from the starting position.  
+   - Return `true` if the destination can be reached, otherwise `false`.  
+8. Print the result.  
 9. End  
    
 
@@ -30,44 +168,164 @@ Each child i has a greed factor g[i], which is the minimum size of a cookie that
 Developed by: DHINESH R
 Register Number:  212223220019
 */
-
 import java.util.*;
 
-public class AssignCookies {
-
-    public static int findContentChildren(int[] g, int[] s) {
-        Arrays.sort(g);
-        Arrays.sort(s);
-        
-        int i = 0;
-        int j = 0;
-        int count = 0;
-        
-        while (i < g.length && j < s.length) {
-            if (s[j] >= g[i]) {
-                count++;
-                i++;
-                j++;
-            } else {
-                j++;
-            }
-        }
-        
-        return count;
-    }
+public class Main {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        
-        int n = sc.nextInt();
-        int[] g = new int[n];
-        for (int i = 0; i < n; i++) g[i] = sc.nextInt();
-        
+
         int m = sc.nextInt();
-        int[] s = new int[m];
-        for (int i = 0; i < m; i++) s[i] = sc.nextInt();
-        
-        System.out.println(findContentChildren(g, s));
+        int n = sc.nextInt();
+
+        int[][] maze = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                maze[i][j] = sc.nextInt();
+            }
+        }
+
+        int[] start = new int[]{sc.nextInt(), sc.nextInt()};
+        int[] destination = new int[]{sc.nextInt(), sc.nextInt()};
+
+        Solution sol = new Solution();
+        boolean result = sol.hasPath(maze, start, destination);
+
+        System.out.println(result);
+    }
+}
+
+class Solution {
+
+    public boolean dfs(int m, int n, int[][] maze, int[] curr, int[] destination, boolean[][] visit) {
+        if (visit[curr[0]][curr[1]]) return false;
+        if (curr[0] == destination[0] && curr[1] == destination[1]) return true;
+        visit[curr[0]][curr[1]] = true;
+
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+
+        for (int[] dir : dirs) {
+            int x = curr[0];
+            int y = curr[1];
+
+            // roll until hitting a wall
+            while (x + dir[0] >= 0 && x + dir[0] < m &&
+                   y + dir[1] >= 0 && y + dir[1] < n &&
+                   maze[x + dir[0]][y + dir[1]] == 0) {
+                x += dir[0];
+                y += dir[1];
+            }
+
+            if (dfs(m, n, maze, new int[]{x, y}, destination, visit)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean hasPath(int[][] maze, int[] start, int[] destination) {
+        int m = maze.length;
+        int n = maze[0].length;
+        boolean[][] visit = new boolean[m][n];
+        return dfs(m, n, maze, start, destination, visit);
+    }
+}
+
+```
+
+## Output:
+<img width="896" height="600" alt="image" src="https://github.com/user-attachments/assets/c5055299-923b-476d-a5df-4251b351c08f" />
+
+
+
+## Result:
+The program successfully implemented and the expected output is verified.
+
+# EX 3C Tug of War problem - Backtracking.
+## DATE : 01/05/2026
+## AIM:
+To write a Java program to for given constraints.
+Given an integer array nums, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or false otherwise.
+Example 1:
+Input: Enter the number of elements: 4
+Enter the elements of the array:
+1 5 11 5
+Output: true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
+
+Constraints:
+
+1 <= nums.length <= 200
+1 <= nums[i] <= 100
+
+## Algorithm
+1. Start  
+2. Read the integer `n` — the number of elements in the array.  
+3. Read `n` integers into the array `nums`.  
+4. Compute the total sum of all elements:  
+   - `totalSum = sum(nums)`  
+5. If `totalSum` is **odd**, return `false` because it cannot be equally partitioned.  
+6. Calculate the target subset sum:  
+   - `target = totalSum / 2`  
+7. Initialize a boolean array `dp[target + 1]` where `dp[i]` represents whether a subset sum of `i` is possible.  
+   - Set `dp[0] = true` (base case: sum `0` is always achievable).  
+8. For each element `num` in `nums`:  
+   - Iterate `j` from `target` down to `num`.  
+   - Update: `dp[j] = dp[j] || dp[j - num]`  
+   - (This ensures we use each element only once per subset.)  
+9. After processing all numbers, if `dp[target]` is `true`, print `true`; otherwise, print `false`.  
+10. End  
+  
+
+## Program:
+```
+/*
+Developed by: DHINESH R
+Register Number:  212223220019
+*/
+import java.util.Scanner;
+
+public class Solution {
+
+    public boolean canPartition(int[] nums) {
+        int totalSum = 0;
+        for (int num : nums) {
+            totalSum += num;
+        }
+
+        // If total sum is odd, can't split equally
+        if (totalSum % 2 != 0) return false;
+
+        int target = totalSum / 2;
+        boolean[] dp = new boolean[target + 1];
+        dp[0] = true; // Base case: sum 0 is always possible
+
+        // For each number, update dp array backward
+        for (int num : nums) {
+            for (int j = target; j >= num; j--) {
+                dp[j] = dp[j] || dp[j - num];
+            }
+        }
+
+        return dp[target];
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Solution sol = new Solution();
+
+        //System.out.print("Enter the number of elements: ");
+        int n = scanner.nextInt();
+
+        int[] nums = new int[n];
+       // System.out.println("Enter the elements of the array:");
+        for (int i = 0; i < n; i++) {
+            nums[i] = scanner.nextInt();
+        }
+
+        boolean canBePartitioned = sol.canPartition(nums);
+        System.out.println(canBePartitioned);
     }
 }
 
@@ -75,37 +333,160 @@ public class AssignCookies {
 
 ## Output:
 
-<img width="649" height="469" alt="image" src="https://github.com/user-attachments/assets/7c99b307-ae12-415e-b466-f1d82522c440" />
+<img width="726" height="381" alt="image" src="https://github.com/user-attachments/assets/4a848402-a5d7-49d0-9b7e-c8df325db96c" />
 
 
 ## Result:
-The program successfully implemented and the expected output is verified.. 
+The program successfully implemented and the expected output is verified.
 
-# EX 2B Jump Game using Greedy Algorithm.
-## DATE: 20/04/2026
+# EX 3D Sudoku solver - Backtracking.
+## DATE : 01/05/2026
 ## AIM:
-To write a Java program to for given constraints.
-You are given an array of integers. Each number represents the maximum number of steps you can jump forward from that position.
+To write a Java program to solve a Sudoku puzzle by filling the empty cells.
 
-You start from the first element (index 0). 
-Write a program to find the minimum number of jumps required to reach the last index of the array.
+For example:
+<img width="357" height="322" alt="image" src="https://github.com/user-attachments/assets/334b8c39-d547-4743-aca0-de92e38bdd1c" />
 
-If it is not possible to reach the end, return -1.
+
+
 ## Algorithm
 1. Start  
-2. Read the integer `n` (size of the array) and input `n` elements into array `nums`.  
-3. If the array is empty, return `-1`. If it has only one element, return `0` (no jumps needed).  
-4. Initialize variables:  
-   - `jumps = 0` → counts the number of jumps made.  
-   - `currentEnd = 0` → the farthest index reachable with the current number of jumps.  
-   - `farthest = 0` → the farthest index reachable overall so far.  
-5. Loop through the array from index `0` to `nums.length - 2`:  
-   - Update `farthest = max(farthest, i + nums[i])`.  
-   - If the current index `i` equals `currentEnd`, increment `jumps` and set `currentEnd = farthest`.  
-   - If `currentEnd` reaches or exceeds the last index, return `jumps` (we can reach the end).  
-   - If `i >= farthest`, return `-1` (cannot move further).  
-6. After the loop, if the end is not reached, return `-1`.  
-7. Print the minimum number of jumps required to reach the end of the array.  
+2. Read a 9×9 Sudoku board as input, where empty cells are represented by `0`.  
+3. Define a function `isSafe(board, row, col, num)` that checks if a number `num` can be placed at position `(row, col)` without violating Sudoku rules:  
+   - The number should not already exist in the same row.  
+   - The number should not already exist in the same column.  
+   - The number should not already exist in the same 3×3 subgrid.  
+4. Define a recursive function `solveSudoku(board, row, col)` to fill the board:  
+   - If `row == 9`, all rows are filled → return `true` (solution found).  
+   - If `col == 9`, move to the next row by calling `solveSudoku(board, row + 1, 0)`.  
+   - If the current cell is already filled (`board[row][col] != 0`), move to the next column.  
+5. For an empty cell `(row, col)`:  
+   - Try placing numbers `1` to `9` one by one.  
+   - For each number, check if it is safe using `isSafe()`.  
+   - If safe, place the number and recursively call `solveSudoku(board, row, col + 1)`.  
+   - If the recursive call returns `true`, a valid solution is found → return `true`.  
+   - Otherwise, reset the cell to `0` (backtrack) and try the next number.  
+6. If no valid number can be placed, return `false` to backtrack further.  
+7. If the function returns `true`, print the solved Sudoku board.  
+8. If the function returns `false`, print "No solution exists."  
+9. End  
+  
+
+## Program:
+```
+/*
+Developed by: DHINESH R
+Register Number:  212223220019
+*/
+import java.util.Scanner;
+
+public class SudokuSolver {
+
+    static boolean isSafe(int[][] board, int row, int col, int num) {
+        for (int i = 0; i < 9; i++) {
+            if (board[row][i] == num || board[i][col] == num)
+                return false;
+        }
+
+        int startRow = row - row % 3;
+        int startCol = col - col % 3;
+
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                if (board[startRow + i][startCol + j] == num)
+                    return false;
+
+        return true;
+    }
+
+    static boolean solveSudoku(int[][] board, int row, int col) {
+        if (row == 9)
+            return true;
+
+        if (col == 9)
+            return solveSudoku(board, row + 1, 0);
+
+        if (board[row][col] != 0)
+            return solveSudoku(board, row, col + 1);
+
+        for (int num = 1; num <= 9; num++) {
+            if (isSafe(board, row, col, num)) {
+                board[row][col] = num;
+                if (solveSudoku(board, row, col + 1))
+                    return true;
+                board[row][col] = 0; // backtrack
+            }
+        }
+        return false;
+    }
+
+    static void printBoard(int[][] board) {
+        for (int[] row : board) {
+            for (int val : row)
+                System.out.print(val + " ");
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int[][] board = new int[9][9];
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                board[i][j] = sc.nextInt();
+            }
+        }
+
+        if (solveSudoku(board, 0, 0)) {
+            System.out.println("Solved Sudoku:");
+            printBoard(board);
+        } else {
+            System.out.println("No solution exists.");
+        }
+
+        sc.close();
+    }
+}
+
+```
+
+## Output:
+
+<img width="1029" height="658" alt="image" src="https://github.com/user-attachments/assets/8835bd6c-b7b9-4d14-bdb9-2c30c03e7cb0" />
+
+
+## Result:
+The program successfully implemented and the expected output is verified.
+
+# EX 3E Generate Permutations using Backtracking  Approach.
+## DATE:05/05/2026
+## AIM:
+To write a Java program to for given constraints.
+Given an array nums of distinct integers, return all the possible Permutation. You can return the answer in any order.
+Example 1:
+Input: nums = [1,2,3]
+Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+For example:
+## Algorithm
+1. Start  
+2. Read the input array `nums` from the user.  
+3. Initialize an empty list `ans` to store all generated permutations.  
+4. Call the recursive function `backtrack(curr, ans, nums)` where:  
+   - `curr` is a list storing the current permutation being built.  
+   - `ans` stores all valid permutations found so far.  
+5. In `backtrack()` function:  
+   - **Base case:**  
+     - If the size of `curr` equals the length of `nums`, a complete permutation is formed.  
+     - Add a **copy** of `curr` to the result list `ans` and return.  
+   - **Recursive case:**  
+     - Iterate through each element `num` in `nums`.  
+     - If `num` is already in `curr`, skip it (since each number can be used only once).  
+     - Add `num` to `curr` (choose step).  
+     - Recursively call `backtrack(curr, ans, nums)` to build the next position.  
+     - After returning, remove the last added number from `curr` (unchoose step / backtrack).  
+6. After all recursive calls complete, `ans` contains all possible permutations.  
+7. Print the list of permutations.  
 8. End  
    
 
@@ -115,245 +496,46 @@ If it is not possible to reach the end, return -1.
 Developed by: DHINESH R
 Register Number:  212223220019
 */
-import java.util.Scanner;
-
-public class MinJumpToEnd {
-
-    
-    public static int minimumJumps(int[] nums) {
-        if (nums == null || nums.length == 0) return -1;
-        if (nums.length == 1) return 0; 
-
-        int jumps = 0;
-        int currentEnd = 0;
-        int farthest = 0;
-
-        for (int i = 0; i < nums.length - 1; i++) {
-            farthest = Math.max(farthest, i + nums[i]);
-
-          
-            if (i == currentEnd) {
-                jumps++;
-                currentEnd = farthest;
-
-                if (currentEnd >= nums.length - 1) {
-                    return jumps; 
-                }
-            }
-
-            if (i >= farthest) { 
-                return -1;
-            }
-        }
-
-        return -1; 
-    }
-
-    
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        int[] nums = new int[n];
-
-        for (int i = 0; i < n; i++) {
-            nums[i] = sc.nextInt();
-        }
-
-        System.out.println("Minimum jumps to reach last index: " + minimumJumps(nums));
-    }
-}
-
-```
-
-## Output:
-
-<img width="1105" height="445" alt="image" src="https://github.com/user-attachments/assets/9643b55b-9541-4bcd-9ac7-9b4a1b21ceef" />
-
-
-## Result:
-The program successfully implemented and the expected output is verified.
-
-# EX 2C Job Sequencing using Greedy Approach
-## DATE : 22/04/2026
-## AIM:
-To write a Java program to for given constraints.
-Given an integer array nums and an integer k, return the number of pairs (i, j) where i < j such that |nums[i] - nums[j]| == k.
-
-The value of |x| is defined as:
-
-x if x >= 0.
--x if x < 0.You're given N jobs, each with:
-
-A unique jobId
-
-A deadline (by which it must be completed)
-
-A profit (earned only if completed on or before the deadline)
-
-Each job:
-
-Takes exactly 1 unit of time
-
-Only one job can be done at a time
-
-Your goal is to maximize total profit while completing the maximum number of jobs possible within their deadlines.
-
-## Algorithm
-1. Start  
-2. Read the integer `n` (number of jobs).  
-3. For each job, input three values — `id`, `deadline`, and `profit` — and store them in an array of `Job` objects.  
-4. Sort the jobs in **descending order of profit** using a custom comparator.  
-5. Find the maximum deadline among all jobs to determine the total number of available time slots.  
-6. Create a boolean array `slot[]` of size `maxDeadline + 1` to track which time slots are filled.  
-7. Initialize `totalProfit = 0` and `countJobs = 0`.  
-8. For each job in the sorted list:  
-   - Check from its deadline down to 1 to find a free slot.  
-   - If a free slot is found, mark it as occupied (`slot[j] = true`).  
-   - Add the job’s profit to `totalProfit` and increment `countJobs`.  
-9. After scheduling all possible jobs, return the total number of jobs done (`countJobs`) and the total profit (`totalProfit`).  
-10. Print both values.  
-11. End  
-  
-
-## Program:
-```
-/*
-Developed by: DHINESH R
-Register Number:  212223220019
-*/
 import java.util.*;
 
-public class JobScheduling {
+public class Solution {
 
-    static class Job {
-        int id, deadline, profit;
-
-        Job(int id, int deadline, int profit) {
-            this.id = id;
-            this.deadline = deadline;
-            this.profit = profit;
-        }
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        backtrack(new ArrayList<>(), ans, nums);
+        return ans;
     }
 
-    public static int[] jobScheduling(Job[] jobs, int n) {
-        Arrays.sort(jobs, (a, b) -> b.profit - a.profit);
-
-        int maxDeadline = 0;
-        for (Job job : jobs) {
-            maxDeadline = Math.max(maxDeadline, job.deadline);
+    public void backtrack(List<Integer> curr, List<List<Integer>> ans, int[] nums) {
+        // Base case: if permutation complete, add to result
+        if (curr.size() == nums.length) {
+            ans.add(new ArrayList<>(curr));
+            return;
         }
 
-        boolean[] slot = new boolean[maxDeadline + 1];
-        int totalProfit = 0;
-        int countJobs = 0;
-
-        for (Job job : jobs) {
-            for (int j = job.deadline; j > 0; j--) {
-                if (!slot[j]) {
-                    slot[j] = true;
-                    totalProfit += job.profit;
-                    countJobs++;
-                    break;
-                }
-            }
-        }
-
-        return new int[]{countJobs, totalProfit};
-    }
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        Job[] jobs = new Job[n];
-
-        for (int i = 0; i < n; i++) {
-            int id = sc.nextInt();
-            int deadline = sc.nextInt();
-            int profit = sc.nextInt();
-            jobs[i] = new Job(id, deadline, profit);
-        }
-
-        int[] result = jobScheduling(jobs, n);
-        System.out.println(result[0] + " " + result[1]);
-    }
-}
-
-```
-
-## Output:
-
-<img width="821" height="551" alt="image" src="https://github.com/user-attachments/assets/e59960d0-7182-4f2a-bead-6f588a1329ba" />
-
-
-## Result:
-The program successfully implemented and the expected output is verified.
-# EX 2D Pattern Matching using Naive Approach.
-## DATE : 22/04/2026
-
-## AIM:
-To write a Java program to for given constraints.
-Given text string with length n and a pattern with length m, the task is to prints all occurrences of pattern in text.
-Note: You may assume that n > m.
-
-Examples: 
-
-Input:  text = "THIS IS A TEST TEXT", pattern = "TEST"
-Output: Pattern found at index 10
-
-Input:  text =  "AABAACAADAABAABA", pattern = "AABA"
-Output: Pattern found at index 0, Pattern found at index 9, Pattern found at index 12
-## Algorithm
-1. Start  
-2. Read the input string `text` and the `pattern` to be searched.  
-3. Find the lengths of both strings:  
-   - `n = length of text`  
-   - `m = length of pattern`  
-4. Loop through the text from index `i = 0` to `i <= n - m`:  
-   - For each position `i`, compare every character of the pattern with the corresponding character in the text.  
-   - If any character does not match, break out of the inner loop.  
-5. If all characters of the pattern match (`j == m`), print the index `i` where the pattern starts in the text.  
-6. Continue checking until the end of the text.  
-7. End  
- 
-
-## Program:
-```
-/*
-Developed by: DHINESH R
-Register Number:  212223220019
-*/
-import java.util.Scanner;
-
-public class NaivePatternSearch {
-
-    public static void search(String text, String pattern) {
-        int n = text.length();
-        int m = pattern.length();
-
-        for (int i = 0; i <= n - m; i++) {
-            int j;
-            for (j = 0; j < m; j++) {
-                if (text.charAt(i + j) != pattern.charAt(j)) {
-                    break;
-                }
-            }
-            if (j == m) {
-                System.out.println("Pattern found at index " + i);
-            }
+        // Try each number not already in current list
+        for (int num : nums) {
+            if (curr.contains(num)) continue; // skip used numbers
+            curr.add(num);                   // choose
+            backtrack(curr, ans, nums);      // explore
+            curr.remove(curr.size() - 1);    // unchoose (backtrack)
         }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        String inputLine = scanner.nextLine().trim();
+        inputLine = inputLine.replaceAll(".*\\[|\\].*", ""); 
+        String[] parts = inputLine.split(",");
 
-        //System.out.print("Enter the text: ");
-        String text = scanner.nextLine();
+        int[] nums = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            nums[i] = Integer.parseInt(parts[i].trim());
+        }
 
-        //System.out.print("Enter the pattern: ");
-        String pattern = scanner.nextLine();
-
-        search(text, pattern);
-
+        Solution solution = new Solution();
+        List<List<Integer>> permutations = solution.permute(nums);
+        System.out.println(permutations);
         scanner.close();
     }
 }
@@ -362,114 +544,9 @@ public class NaivePatternSearch {
 
 ## Output:
 
-<img width="1042" height="411" alt="image" src="https://github.com/user-attachments/assets/4fbde6a2-3110-4802-8d7e-116d13020d3d" />
+<img width="1279" height="353" alt="image" src="https://github.com/user-attachments/assets/2b5ba92b-e514-4180-96f7-f10557ea6e7a" />
 
 
 ## Result:
 The program successfully implemented and the expected output is verified.
 
-# EX 2E Pattern Matching using Manacher's Algorithm.
-## DATE : 24/04/2026
-
-## AIM:
-To write a Java program for the following constraints.
-Longest Palindromic Substring
-Given a string s, return the longest palindromic substring in s.
-using Manacher's Algorithm
-
-## Algorithm
-1. Start  
-2. Read the input string `s`.  
-3. If the string is empty, return an empty result.  
-4. Preprocess the string by inserting a special character (e.g., `#`) between each letter and at both ends to handle even-length palindromes uniformly.  
-   - Example: `"abba"` → `"#a#b#b#a#"`  
-5. Initialize variables:  
-   - `p[]` → array to store palindrome radii centered at each position  
-   - `center = 0` and `right = 0` → current center and right boundary of the known palindrome  
-   - `maxLen = 0` and `centerIndex = 0` → track longest palindrome found so far  
-6. For each position `i` in the processed string:  
-   - Find the mirror position: `mirror = 2 * center - i`  
-   - If `i < right`, set `p[i] = min(right - i, p[mirror])`.  
-   - Expand around `i` while characters on both sides match (`t[a] == t[b]`).  
-   - Update `p[i]` for every successful expansion.  
-7. If `i + p[i] > right`, update `center = i` and `right = i + p[i]`.  
-8. If `p[i] > maxLen`, update `maxLen` and `centerIndex`.  
-9. Compute the starting index of the palindrome in the original string:  
-   - `start = (centerIndex - maxLen) / 2`  
-10. Extract and return the substring from `start` to `start + maxLen`.  
-11. Print the longest palindromic substring.  
-12. End  
-
-
-## Program:
-```
-/*
-Developed by:DHINESH R
-Register Number:  212223220019
-*/
-import java.util.Scanner;
-
-public class LongestPalindromeManacher {
-
-    public static String longestPalindrome(String s) {
-        if (s == null || s.length() == 0) return "";
-
-        StringBuilder t = new StringBuilder();
-        t.append('#');
-        for (int i = 0; i < s.length(); i++) {
-            t.append(s.charAt(i));
-            t.append('#');
-        }
-
-        int n = t.length();
-        int[] p = new int[n];
-        int center = 0, right = 0;
-        int maxLen = 0, centerIndex = 0;
-
-        for (int i = 0; i < n; i++) {
-            int mirror = 2 * center - i;
-            if (i < right) {
-                p[i] = Math.min(right - i, p[mirror]);
-            }
-
-            int a = i + (1 + p[i]);
-            int b = i - (1 + p[i]);
-            while (a < n && b >= 0 && t.charAt(a) == t.charAt(b)) {
-                p[i]++;
-                a++;
-                b--;
-            }
-
-            if (i + p[i] > right) {
-                center = i;
-                right = i + p[i];
-            }
-
-            if (p[i] > maxLen) {
-                maxLen = p[i];
-                centerIndex = i;
-            }
-        }
-
-        int start = (centerIndex - maxLen) / 2;
-        return s.substring(start, start + maxLen);
-    }
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine();
-        String result = longestPalindrome(input);
-        System.out.println("Longest Palindromic Substring: " + result);
-        sc.close();
-    }
-}
-
-```
-
-## Output:
-
-<img width="1266" height="391" alt="image" src="https://github.com/user-attachments/assets/c9ecddb8-7f68-427c-b22f-0149833458aa" />
-
-
-## Result:
-The program successfully implemented and the expected output is verified.
