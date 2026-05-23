@@ -1,286 +1,299 @@
-
-# EX 3A N Queens Problem - Backtracking Approach.
-## DATE: 01/05/2026
+# EX 4A Kadane's Algorithm - Dynamic Programming. 
+## DATE: 12/05/2026
 ## AIM:
-To Write a Java program for N queens using backtracking approach.
-You are given an integer N. For a given N x N chessboard, find a way to place 'N' queens such that no queen can attack any other queen on the chessboard.
-A queen can be attacked when it lies in the same row, column, or the same diagonal as any of the other queens. You have to print one such configuration.
-Chess Board
-<img width="241" height="209" alt="image" src="https://github.com/user-attachments/assets/96aacb61-4f34-423f-b324-5e34454e42b8" />
+To Write a Java program to solve the below problem using Kadane's Algorithm.
+A solar company installs solar panels around a circular grid of n buildings. Each building either generates or consumes net energy, represented by integers (+ve for generated, -ve for consumed).
 
+The company wants to find a contiguous sequence of buildings (possibly wrapping around from the end to the beginning) that maximizes the total net energy.
 
-Note :
+Write a program to compute the maximum net energy that can be collected from any contiguous block of buildings on the circular grid.
 
-Get the input from the user for N . The value of N must be from 1 to 4
+Input Format:
+First line: Integer n (number of buildings)
 
-If solution exists Print a binary matrix as output that has 1s for the cells where queens are placed
+Second line: n space-separated integers: net energy for each building
 
-If there is no solution to the problem  print  "Solution does not exist"
+Output Format:
+A single integer: Maximum net energy collectable from a contiguous block (wrapping allowed)
 
+Constraints:
+1 <= n <= 10^6
 ## Algorithm
-1. Start  
-2. Read the integer `N` — the size of the chessboard and the number of queens to be placed.  
-3. Initialize an `N × N` chessboard with all cells set to `0`.  
-4. Define a recursive function `solveNQUtil(board, col)` to place queens one column at a time:  
-   - If `col >= N`, all queens are placed successfully → return `true`.  
-   - For each row `i` in column `col`:  
-     - Check if placing a queen at `(i, col)` is safe using the `isSafe()` function.  
-     - If safe:  
-       - Place a queen (`board[i][col] = 1`).  
-       - Recursively call `solveNQUtil(board, col + 1)` to place the rest.  
-       - If successful, return `true`.  
-       - If not, backtrack (`board[i][col] = 0`).  
-   - If no safe position is found in this column, return `false`.  
-5. The `isSafe()` function checks if a queen can be placed at position `(row, col)` by verifying:  
-   - No other queen exists in the same row on the left.  
-   - No other queen exists in the upper-left diagonal.  
-   - No other queen exists in the lower-left diagonal.  
-6. If the recursive function returns `false`, print “Solution does not exist.”  
-7. If successful, print the board configuration where `1` indicates a queen’s position.  
-8. End  
-   
+
+1. Start the program and read the number of solar panels `n` and their energy values into an array.
+2. Use Kadane’s algorithm (`kadane()`) to find the maximum subarray sum without wrapping around.
+3. Calculate the total energy sum and use another Kadane’s algorithm (`kadaneMin()`) to find the minimum subarray sum.
+4. Compute the maximum circular sum as `totalSum - minSubarraySum` and compare it with the non-circular maximum.
+5. Print the greater value as the maximum solar energy that can be obtained.
 
 ## Program:
 ```
 /*
-
-Developed by: DHINESH R
-Register Number:  212223220019
-*/
-import java.util.Scanner;
-
-public class NQueens {
-    static int N;
-
-    static void printSolution(int[][] board) {
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                System.out.print(board[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
-    static boolean isSafe(int[][] board, int row, int col) {
-        for (int i = 0; i < col; i++)
-            if (board[row][i] == 1)
-                return false;
-
-        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--)
-            if (board[i][j] == 1)
-                return false;
-
-        for (int i = row, j = col; i < N && j >= 0; i++, j--)
-            if (board[i][j] == 1)
-                return false;
-
-        return true;
-    }
-
-    static boolean solveNQUtil(int[][] board, int col) {
-        if (col >= N)
-            return true;
-
-        for (int i = 0; i < N; i++) {
-            if (isSafe(board, i, col)) {
-                board[i][col] = 1;
-
-                if (solveNQUtil(board, col + 1))
-                    return true;
-
-                board[i][col] = 0;
-            }
-        }
-        return false;
-    }
-
-    static boolean solveNQ() {
-        int[][] board = new int[N][N];
-
-        if (!solveNQUtil(board, 0)) {
-            System.out.println("Solution does not exist");
-            return false;
-        }
-
-        printSolution(board);
-        return true;
-    }
-
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        N = scanner.nextInt();
-        solveNQ();
-    }
-}
-
-```
-
-## Output:
-
-<img width="811" height="404" alt="image" src="https://github.com/user-attachments/assets/64584491-f648-4f9a-8803-0c1f5026f1ef" />
-
-
-## Result:
-The program successfully implemented and the ouput is verified. 
-
-# EX 3B Rat in Maze- Backtracking 
-## DATE : 01/05/2026
-## AIM:
-To write a Java program to for given constraints.
-here is a ball in a maze with empty spaces (represented as 0) and walls (represented as 1). The ball can go through the empty spaces by rolling up, down, left or right, but it won't stop rolling until hitting a wall. When the ball stops, it could choose the next direction.
-
-Given the m x n maze, the ball's start position and the destination, where start = [startrow, startcol] and destination = [destinationrow, destinationcol], return true if the ball can stop at the destination, otherwise return false.
-
-You may assume that the borders of the maze are all walls (see examples).
-<img width="573" height="573" alt="image" src="https://github.com/user-attachments/assets/d6f1c054-cdc2-4bb3-9c55-512fb2cf0fb7" />
-Input: maze = [[0,0,1,0,0],[0,0,0,0,0],[0,0,0,1,0],[1,1,0,1,1],[0,0,0,0,0]], start = [0,4], destination = [4,4]
-Output: true
-Explanation: One possible way is : left -> down -> left -> down -> right -> down -> right.
-
-
-## Algorithm
-1. Start  
-2. Read the dimensions of the maze: `m` (rows) and `n` (columns).  
-3. Read the maze as a 2D grid of size `m × n`, where:  
-   - `0` represents an open path  
-   - `1` represents a wall  
-4. Read the starting position `start[]` and the destination position `destination[]`.  
-5. Initialize a 2D boolean array `visit[m][n]` to track visited cells.  
-6. Define a recursive function `dfs(m, n, maze, curr, destination, visit)` that:  
-   - Returns `false` if the current cell is already visited.  
-   - Returns `true` if the current cell equals the destination cell.  
-   - Marks the current cell as visited.  
-   - Defines four movement directions: up, down, left, right.  
-   - For each direction:  
-     - Move continuously (roll) in that direction until hitting a wall (`1`) or the boundary of the maze.  
-     - Once stopped, recursively call `dfs()` from the stopping position.  
-     - If any recursive call returns `true`, propagate success upward.  
-7. In the `hasPath()` function:  
-   - Initialize parameters and call the DFS function from the starting position.  
-   - Return `true` if the destination can be reached, otherwise `false`.  
-8. Print the result.  
-9. End  
-   
-
-## Program:
-```
-/*
+Program to implement Reverse a String
 Developed by: DHINESH R
 Register Number:  212223220019
 */
 import java.util.*;
 
-public class Main {
+public class SolarEnergyMaximizer {
+
+    public static int maxCircularEnergy(int[] energy) {
+        int maxKadane = kadane(energy); // Maximum subarray sum without wrapping
+        int totalSum = 0;
+        for (int num : energy) totalSum += num;
+
+        // Find minimum subarray sum to calculate circular sum
+        int minSubarraySum = kadaneMin(energy);
+        int maxCircular = totalSum - minSubarraySum; // Maximum with wrapping
+
+        // If all numbers are negative, maxCircular can be 0, so return maxKadane
+        return maxCircular > 0 ? Math.max(maxKadane, maxCircular) : maxKadane;
+    }
+
+    // Standard Kadane's algorithm for max subarray sum
+    private static int kadane(int[] arr) {
+        int maxSoFar = arr[0], maxEndingHere = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            maxEndingHere = Math.max(arr[i], maxEndingHere + arr[i]);
+            maxSoFar = Math.max(maxSoFar, maxEndingHere);
+        }
+        return maxSoFar;
+    }
+
+    // Kadane's algorithm for minimum subarray sum
+    private static int kadaneMin(int[] arr) {
+        int minSoFar = arr[0], minEndingHere = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            minEndingHere = Math.min(arr[i], minEndingHere + arr[i]);
+            minSoFar = Math.min(minSoFar, minEndingHere);
+        }
+        return minSoFar;
+    }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-
-        int m = sc.nextInt();
         int n = sc.nextInt();
-
-        int[][] maze = new int[m][n];
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                maze[i][j] = sc.nextInt();
-            }
+        int[] energy = new int[n];
+        for (int i = 0; i < n; i++) {
+            energy[i] = sc.nextInt();
         }
-
-        int[] start = new int[]{sc.nextInt(), sc.nextInt()};
-        int[] destination = new int[]{sc.nextInt(), sc.nextInt()};
-
-        Solution sol = new Solution();
-        boolean result = sol.hasPath(maze, start, destination);
-
-        System.out.println(result);
+        System.out.println(maxCircularEnergy(energy));
     }
 }
 
-class Solution {
 
-    public boolean dfs(int m, int n, int[][] maze, int[] curr, int[] destination, boolean[][] visit) {
-        if (visit[curr[0]][curr[1]]) return false;
-        if (curr[0] == destination[0] && curr[1] == destination[1]) return true;
-        visit[curr[0]][curr[1]] = true;
+```
 
-        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+## Output:
 
-        for (int[] dir : dirs) {
-            int x = curr[0];
-            int y = curr[1];
+<img width="425" height="234" alt="image" src="https://github.com/user-attachments/assets/22686834-fd7b-40ef-9110-e145238df6aa" />
 
-            // roll until hitting a wall
-            while (x + dir[0] >= 0 && x + dir[0] < m &&
-                   y + dir[1] >= 0 && y + dir[1] < n &&
-                   maze[x + dir[0]][y + dir[1]] == 0) {
-                x += dir[0];
-                y += dir[1];
-            }
 
-            if (dfs(m, n, maze, new int[]{x, y}, destination, visit)) {
-                return true;
-            }
-        }
+## Result:
+The program successfully Implemented and the output is verified. 
+# EX 4B Frog Jump - Dynamic Programming.
+## DATE: 12/05/2026
+## AIM:
+To write a Java program to for given constraints.
+A Frog Jump 1 or 2 steps at a time.
+Problem Statement:
 
-        return false;
+A frog is at the bottom of the stairs with n steps. It can jump either 1 or 2 steps at a time. Write a program to find the number of distinct ways the frog can reach the top (n-th step).
+
+Input Format:
+
+A single integer n (1 ≤ n ≤ 45) – number of steps.
+ Output Format:
+
+A single integer – number of distinct ways to reach step n.
+
+## Algorithm
+
+1. Start the program and read the integer `n` (number of steps) from the user.
+2. If `n` equals 1, return 1; if `n` equals 2, return 2.
+3. Initialize two variables: `first = 1` and `second = 2` to represent ways to reach steps 1 and 2.
+4. Use a loop from 3 to `n`, updating `current = first + second`, then shift values (`first = second`, `second = current`).
+5. After the loop ends, print the value of `current` as the total number of ways the frog can reach step `n`.
+ 
+
+## Program:
+```
+/*
+Program to implement Reverse a String
+Developed by: DHINESH R
+Register Number:  212223220019
+*/
+import java.util.Scanner;
+
+public class FrogJump {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        scanner.close();
+
+        System.out.println(countWays(n));
     }
 
-    public boolean hasPath(int[][] maze, int[] start, int[] destination) {
-        int m = maze.length;
-        int n = maze[0].length;
-        boolean[][] visit = new boolean[m][n];
-        return dfs(m, n, maze, start, destination, visit);
+    public static int countWays(int n) {
+        if (n == 1) return 1;
+        if (n == 2) return 2;
+
+        int first = 1; // ways to reach step 1
+        int second = 2; // ways to reach step 2
+        int current = 0;
+
+        for (int i = 3; i <= n; i++) {
+            current = first + second; // ways to reach current step
+            first = second;
+            second = current;
+        }
+
+        return current;
     }
 }
 
 ```
 
 ## Output:
-<img width="896" height="600" alt="image" src="https://github.com/user-attachments/assets/c5055299-923b-476d-a5df-4251b351c08f" />
+
+<img width="354" height="194" alt="image" src="https://github.com/user-attachments/assets/ae308935-4cb9-482c-b8b8-131b47fed462" />
+
+
+## Result:
+The program successfully implemented and the expected output is verified.
+# EX 4C Coin Change Problem - Dynamic Programming.
+## DATE: 14/05/2026
+## AIM:
+To write a Java program to for given constraints.
+You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.
+
+Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
+
+You may assume that you have an infinite number of each kind of coin.
+
+## Algorithm
+
+1. Read the coin denominations and target amount as input.
+2. Initialize a `dp` array of size `amount + 1` with a large value (`amount + 1`), and set `dp[0] = 0`.
+3. For each amount `i` from `1` to `amount`, iterate through all coin values.
+4. If `i - coin >= 0`, update `dp[i] = min(dp[i], dp[i - coin] + 1)` to track the minimum coins needed.
+5. After filling the `dp` array, print `dp[amount]` if it’s valid; otherwise, print `-1` if the amount cannot be formed.
+
+
+## Program:
+```
+/*
+Program to implement Reverse a String
+Developed by: DHINESH R
+Register Number:  212223220019
+*/
+import java.util.*;
+
+public class Solution {
+    public int coinChange(int[] coins, int amount) {
+        int max = amount + 1;
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, max);  // Initialize with a value greater than any possible answer
+        dp[0] = 0;  // Base case: 0 coins needed to make amount 0
+
+        for (int i = 1; i <= amount; i++) {
+            for (int coin : coins) {
+                if (i - coin >= 0) {
+                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+
+        return dp[amount] > amount ? -1 : dp[amount];
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Solution solution = new Solution();
+
+        String coinsLine = scanner.nextLine(); 
+        String amountLine = scanner.nextLine();
+
+        coinsLine = coinsLine.replaceAll("[^0-9,]", ""); 
+        String[] coinsStr = coinsLine.split(",");
+        int[] coins = new int[coinsStr.length];
+        for (int i = 0; i < coinsStr.length; i++) {
+            coins[i] = Integer.parseInt(coinsStr[i]);
+        }
+
+        int amount = Integer.parseInt(amountLine.replaceAll("[^0-9]", ""));
+        int result = solution.coinChange(coins, amount);
+        System.out.println(result);
+
+        scanner.close();
+    }
+}
+
+```
+
+## Output:
+<img width="381" height="233" alt="image" src="https://github.com/user-attachments/assets/5e89c89e-b032-4cbf-be3d-96755cc94f62" />
 
 
 
 ## Result:
 The program successfully implemented and the expected output is verified.
 
-# EX 3C Tug of War problem - Backtracking.
-## DATE : 01/05/2026
+# EX 4D Longest Common SubSequence - Dynamic Programming.
+## DATE: 15/05/2026
 ## AIM:
 To write a Java program to for given constraints.
-Given an integer array nums, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or false otherwise.
-Example 1:
-Input: Enter the number of elements: 4
-Enter the elements of the array:
-1 5 11 5
-Output: true
-Explanation: The array can be partitioned as [1, 5, 5] and [11].
+Given two strings text1 and text2, return the length of their longest common subsequence. If there is no common subsequence, return 0.
+A subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.
 
+For example, "ace" is a subsequence of "abcde".
+A common subsequence of two strings is a subsequence that is common to both strings.
+
+Input: text1 = "abcde", text2 = "ace" 
+Output: 3  
+Explanation: The longest common subsequence is "ace" and its length is 3.
 Constraints:
 
-1 <= nums.length <= 200
-1 <= nums[i] <= 100
+1 <= text1.length, text2.length <= 1000
+text1 and text2 consist of only lowercase English characters.
 
 ## Algorithm
-1. Start  
-2. Read the integer `n` — the number of elements in the array.  
-3. Read `n` integers into the array `nums`.  
-4. Compute the total sum of all elements:  
-   - `totalSum = sum(nums)`  
-5. If `totalSum` is **odd**, return `false` because it cannot be equally partitioned.  
-6. Calculate the target subset sum:  
-   - `target = totalSum / 2`  
-7. Initialize a boolean array `dp[target + 1]` where `dp[i]` represents whether a subset sum of `i` is possible.  
-   - Set `dp[0] = true` (base case: sum `0` is always achievable).  
-8. For each element `num` in `nums`:  
-   - Iterate `j` from `target` down to `num`.  
-   - Update: `dp[j] = dp[j] || dp[j - num]`  
-   - (This ensures we use each element only once per subset.)  
-9. After processing all numbers, if `dp[target]` is `true`, print `true`; otherwise, print `false`.  
-10. End  
+**Procedure:**
+
+1. **Input:**
+
+   * Read two strings, `text1` and `text2`, from the user.
+
+2. **Initialization:**
+
+   * Let `m` = length of `text1` and `n` = length of `text2`.
+   * Create a 2D array `dp[m+1][n+1]`, where `dp[i][j]` stores the length of the longest common subsequence (LCS) between `text1[0..i-1]` and `text2[0..j-1]`.
+
+3. **Filling the DP Table:**
+
+   * For each `i` from `1` to `m`:
+
+     * For each `j` from `1` to `n`:
+
+       * If characters match (`text1.charAt(i-1) == text2.charAt(j-1)`):
+         → `dp[i][j] = 1 + dp[i-1][j-1]`
+       * Else:
+         → `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`
+
+4. **Result:**
+
+   * The value `dp[m][n]` gives the **length of the longest common subsequence**.
+
+5. **Output:**
+
+   * Print the result:
+     `"Length of Longest Common Subsequence: " + dp[m][n]`
   
 
 ## Program:
 ```
 /*
+Program to implement Reverse a String
 Developed by: DHINESH R
 Register Number:  212223220019
 */
@@ -288,162 +301,35 @@ import java.util.Scanner;
 
 public class Solution {
 
-    public boolean canPartition(int[] nums) {
-        int totalSum = 0;
-        for (int num : nums) {
-            totalSum += num;
-        }
+    public int longestCommonSubsequence(String text1, String text2) {
+        int m = text1.length();
+        int n = text2.length();
 
-        // If total sum is odd, can't split equally
-        if (totalSum % 2 != 0) return false;
+        int[][] dp = new int[m + 1][n + 1]; // dp[i][j] = LCS of text1[0..i-1] & text2[0..j-1]
 
-        int target = totalSum / 2;
-        boolean[] dp = new boolean[target + 1];
-        dp[0] = true; // Base case: sum 0 is always possible
-
-        // For each number, update dp array backward
-        for (int num : nums) {
-            for (int j = target; j >= num; j--) {
-                dp[j] = dp[j] || dp[j - num];
+        // Fill dp table
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
+                    dp[i][j] = 1 + dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
             }
         }
 
-        return dp[target];
-    }
-
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Solution sol = new Solution();
-
-        //System.out.print("Enter the number of elements: ");
-        int n = scanner.nextInt();
-
-        int[] nums = new int[n];
-       // System.out.println("Enter the elements of the array:");
-        for (int i = 0; i < n; i++) {
-            nums[i] = scanner.nextInt();
-        }
-
-        boolean canBePartitioned = sol.canPartition(nums);
-        System.out.println(canBePartitioned);
-    }
-}
-
-```
-
-## Output:
-
-<img width="726" height="381" alt="image" src="https://github.com/user-attachments/assets/4a848402-a5d7-49d0-9b7e-c8df325db96c" />
-
-
-## Result:
-The program successfully implemented and the expected output is verified.
-
-# EX 3D Sudoku solver - Backtracking.
-## DATE : 01/05/2026
-## AIM:
-To write a Java program to solve a Sudoku puzzle by filling the empty cells.
-
-For example:
-<img width="357" height="322" alt="image" src="https://github.com/user-attachments/assets/334b8c39-d547-4743-aca0-de92e38bdd1c" />
-
-
-
-## Algorithm
-1. Start  
-2. Read a 9×9 Sudoku board as input, where empty cells are represented by `0`.  
-3. Define a function `isSafe(board, row, col, num)` that checks if a number `num` can be placed at position `(row, col)` without violating Sudoku rules:  
-   - The number should not already exist in the same row.  
-   - The number should not already exist in the same column.  
-   - The number should not already exist in the same 3×3 subgrid.  
-4. Define a recursive function `solveSudoku(board, row, col)` to fill the board:  
-   - If `row == 9`, all rows are filled → return `true` (solution found).  
-   - If `col == 9`, move to the next row by calling `solveSudoku(board, row + 1, 0)`.  
-   - If the current cell is already filled (`board[row][col] != 0`), move to the next column.  
-5. For an empty cell `(row, col)`:  
-   - Try placing numbers `1` to `9` one by one.  
-   - For each number, check if it is safe using `isSafe()`.  
-   - If safe, place the number and recursively call `solveSudoku(board, row, col + 1)`.  
-   - If the recursive call returns `true`, a valid solution is found → return `true`.  
-   - Otherwise, reset the cell to `0` (backtrack) and try the next number.  
-6. If no valid number can be placed, return `false` to backtrack further.  
-7. If the function returns `true`, print the solved Sudoku board.  
-8. If the function returns `false`, print "No solution exists."  
-9. End  
-  
-
-## Program:
-```
-/*
-Developed by: DHINESH R
-Register Number:  212223220019
-*/
-import java.util.Scanner;
-
-public class SudokuSolver {
-
-    static boolean isSafe(int[][] board, int row, int col, int num) {
-        for (int i = 0; i < 9; i++) {
-            if (board[row][i] == num || board[i][col] == num)
-                return false;
-        }
-
-        int startRow = row - row % 3;
-        int startCol = col - col % 3;
-
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                if (board[startRow + i][startCol + j] == num)
-                    return false;
-
-        return true;
-    }
-
-    static boolean solveSudoku(int[][] board, int row, int col) {
-        if (row == 9)
-            return true;
-
-        if (col == 9)
-            return solveSudoku(board, row + 1, 0);
-
-        if (board[row][col] != 0)
-            return solveSudoku(board, row, col + 1);
-
-        for (int num = 1; num <= 9; num++) {
-            if (isSafe(board, row, col, num)) {
-                board[row][col] = num;
-                if (solveSudoku(board, row, col + 1))
-                    return true;
-                board[row][col] = 0; // backtrack
-            }
-        }
-        return false;
-    }
-
-    static void printBoard(int[][] board) {
-        for (int[] row : board) {
-            for (int val : row)
-                System.out.print(val + " ");
-            System.out.println();
-        }
+        return dp[m][n];
     }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int[][] board = new int[9][9];
+        Solution sol = new Solution();
 
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                board[i][j] = sc.nextInt();
-            }
-        }
+        String text1 = sc.nextLine().replaceAll("\"", "");
+        String text2 = sc.nextLine().replaceAll("\"", "");
 
-        if (solveSudoku(board, 0, 0)) {
-            System.out.println("Solved Sudoku:");
-            printBoard(board);
-        } else {
-            System.out.println("No solution exists.");
-        }
+        int lcsLength = sol.longestCommonSubsequence(text1, text2);
+        System.out.println("Length of Longest Common Subsequence: " + lcsLength);
 
         sc.close();
     }
@@ -452,90 +338,94 @@ public class SudokuSolver {
 ```
 
 ## Output:
+<img width="833" height="255" alt="image" src="https://github.com/user-attachments/assets/f08d14f5-2d4e-454b-a4c0-ecbe868c1ad3" />
 
-<img width="1029" height="658" alt="image" src="https://github.com/user-attachments/assets/8835bd6c-b7b9-4d14-bdb9-2c30c03e7cb0" />
 
 
 ## Result:
 The program successfully implemented and the expected output is verified.
 
-# EX 3E Generate Permutations using Backtracking  Approach.
-## DATE:05/05/2026
+# EX 4E Longest Increasing Subsequence - Dynamic Programming.
+## DATE: 15/05/2026
 ## AIM:
 To write a Java program to for given constraints.
-Given an array nums of distinct integers, return all the possible Permutation. You can return the answer in any order.
+Given an integer array nums, return the length of the longest strictly increasing subsequence.
 Example 1:
-Input: nums = [1,2,3]
-Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
-For example:
+Input: nums = [10,9,2,5,3,7,101,18]
+Output: 4
+Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
 ## Algorithm
-1. Start  
-2. Read the input array `nums` from the user.  
-3. Initialize an empty list `ans` to store all generated permutations.  
-4. Call the recursive function `backtrack(curr, ans, nums)` where:  
-   - `curr` is a list storing the current permutation being built.  
-   - `ans` stores all valid permutations found so far.  
-5. In `backtrack()` function:  
-   - **Base case:**  
-     - If the size of `curr` equals the length of `nums`, a complete permutation is formed.  
-     - Add a **copy** of `curr` to the result list `ans` and return.  
-   - **Recursive case:**  
-     - Iterate through each element `num` in `nums`.  
-     - If `num` is already in `curr`, skip it (since each number can be used only once).  
-     - Add `num` to `curr` (choose step).  
-     - Recursively call `backtrack(curr, ans, nums)` to build the next position.  
-     - After returning, remove the last added number from `curr` (unchoose step / backtrack).  
-6. After all recursive calls complete, `ans` contains all possible permutations.  
-7. Print the list of permutations.  
-8. End  
-   
+
+1. **Input:**
+
+   * Read the integer `n` (size of array).
+   * Read `n` integers into the array `nums`.
+
+2. **Initialization:**
+
+   * Create an array `dp[n]`, where `dp[i]` stores the **length of the longest increasing subsequence (LIS)** ending at index `i`.
+   * Initialize all values of `dp` to `1`, since each element is an LIS of length `1` by itself.
+   * Initialize `maxLen = 1` to keep track of the overall maximum LIS length.
+
+3. **Dynamic Programming Logic:**
+
+   * For each element `nums[i]` (from index `1` to `n-1`):
+
+     * Compare it with all previous elements `nums[j]` (where `j < i`).
+     * If `nums[i] > nums[j]`, it means we can extend the subsequence ending at `j`.
+       → Update `dp[i] = max(dp[i], dp[j] + 1)`
+   * After each iteration, update `maxLen = max(maxLen, dp[i])`.
+
+4. **Output:**
+
+   * Print `maxLen`, which represents the **length of the longest increasing subsequence**.
+ 
 
 ## Program:
 ```
 /*
+Program to implement Reverse a String
 Developed by: DHINESH R
 Register Number:  212223220019
 */
 import java.util.*;
 
-public class Solution {
+public class LongestIncreasingSubsequence {
 
-    public List<List<Integer>> permute(int[] nums) {
-        List<List<Integer>> ans = new ArrayList<>();
-        backtrack(new ArrayList<>(), ans, nums);
-        return ans;
-    }
+    public static int lengthOfLIS(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
 
-    public void backtrack(List<Integer> curr, List<List<Integer>> ans, int[] nums) {
-        // Base case: if permutation complete, add to result
-        if (curr.size() == nums.length) {
-            ans.add(new ArrayList<>(curr));
-            return;
+        int n = nums.length;
+        int[] dp = new int[n];  // dp[i] = length of LIS ending at nums[i]
+        Arrays.fill(dp, 1);     // Each element is a LIS of length 1 by itself
+
+        int maxLen = 1;
+
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+            maxLen = Math.max(maxLen, dp[i]);
         }
 
-        // Try each number not already in current list
-        for (int num : nums) {
-            if (curr.contains(num)) continue; // skip used numbers
-            curr.add(num);                   // choose
-            backtrack(curr, ans, nums);      // explore
-            curr.remove(curr.size() - 1);    // unchoose (backtrack)
-        }
+        return maxLen;
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String inputLine = scanner.nextLine().trim();
-        inputLine = inputLine.replaceAll(".*\\[|\\].*", ""); 
-        String[] parts = inputLine.split(",");
 
-        int[] nums = new int[parts.length];
-        for (int i = 0; i < parts.length; i++) {
-            nums[i] = Integer.parseInt(parts[i].trim());
+        int n = scanner.nextInt();
+        int[] nums = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            nums[i] = scanner.nextInt();
         }
 
-        Solution solution = new Solution();
-        List<List<Integer>> permutations = solution.permute(nums);
-        System.out.println(permutations);
+        int result = lengthOfLIS(nums);
+        System.out.println("Length of Longest Increasing Subsequence: " + result);
+
         scanner.close();
     }
 }
@@ -543,10 +433,9 @@ public class Solution {
 ```
 
 ## Output:
+<img width="812" height="257" alt="image" src="https://github.com/user-attachments/assets/520c0acf-b436-422b-9aff-b9e07ce4377b" />
 
-<img width="1279" height="353" alt="image" src="https://github.com/user-attachments/assets/2b5ba92b-e514-4180-96f7-f10557ea6e7a" />
 
 
 ## Result:
 The program successfully implemented and the expected output is verified.
-
