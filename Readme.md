@@ -1,30 +1,70 @@
-# EX 4A Kadane's Algorithm - Dynamic Programming. 
-## DATE: 12/05/2026
+# EX 5A 0/1 Knapsack Problem - Branch&Bound 
+## DATE: 18/05/2026
 ## AIM:
-To Write a Java program to solve the below problem using Kadane's Algorithm.
-A solar company installs solar panels around a circular grid of n buildings. Each building either generates or consumes net energy, represented by integers (+ve for generated, -ve for consumed).
+To Write a Java program to solve 0/1 Knapsack problem using Branch and Bound Approach.
+You are heading a college entrepreneurship cell that can invest in up to N student‑startups.
 
-The company wants to find a contiguous sequence of buildings (possibly wrapping around from the end to the beginning) that maximizes the total net energy.
+For each startup i you know: cost[i]  — the amount (in ₹ lakh) required to join the showcase profit[i] — the estimated profit (in ₹ lakh) you’ll gain if it succeeds You have a total budget of B ₹ lakh. Pick a subset of startups so that the sum of costs ≤ B and the sum of profits is maximised.
 
-Write a program to compute the maximum net energy that can be collected from any contiguous block of buildings on the circular grid.
+Because N can be as large as 50, a plain exhaustive search (2^N) is too slow.
 
-Input Format:
-First line: Integer n (number of buildings)
+The recommended approach is Branch & Bound with a fractional‑knapsack upper bound (but any algorithm that meets the constraints is accepted). 
 
-Second line: n space-separated integers: net energy for each building
+Input Format
 
-Output Format:
-A single integer: Maximum net energy collectable from a contiguous block (wrapping allowed)
+N
 
-Constraints:
-1 <= n <= 10^6
+B
+
+cost[1] cost[2] … cost[N]
+
+profit[1] profit[2] … profit[N]
+
+1 ≤ N ≤ 50
+
+1 ≤ B ≤ 1 000 000
+
+1 ≤ cost[i], profit[i] ≤ 10 000 
+
+Output Format
+
+maxProfit
+
+For example:
+
+
+
+
 ## Algorithm
 
-1. Start the program and read the number of solar panels `n` and their energy values into an array.
-2. Use Kadane’s algorithm (`kadane()`) to find the maximum subarray sum without wrapping around.
-3. Calculate the total energy sum and use another Kadane’s algorithm (`kadaneMin()`) to find the minimum subarray sum.
-4. Compute the maximum circular sum as `totalSum - minSubarraySum` and compare it with the non-circular maximum.
-5. Print the greater value as the maximum solar energy that can be obtained.
+1. **Input:**
+
+   * Read number of items `N` and bag capacity `B`.
+   * Read the `cost` and `profit` of each item.
+
+2. **Initialization:**
+
+   * Create `Item` objects storing `cost`, `profit`, and `profit-to-cost ratio`.
+   * Sort items in **descending order of ratio** (profit per cost).
+
+3. **Bounding Function:**
+
+   * Define a `bound()` function to calculate the **upper bound of profit** that can be achieved from a given node using fractional knapsack logic.
+
+4. **Branch and Bound Logic:**
+
+   * Use a **queue** to explore possible item selections.
+   * For each node (state), generate two branches:
+
+     * **Include** the next item.
+     * **Exclude** the next item.
+   * Update `maxProfit` if a valid higher profit is found.
+   * Add nodes to the queue only if their bound is greater than current `maxProfit`.
+
+5. **Output:**
+
+   * After exploring all possible branches, print the **maximum achievable profit**.
+
 
 ## Program:
 ```
@@ -35,150 +75,288 @@ Register Number:  212223220019
 */
 import java.util.*;
 
-public class SolarEnergyMaximizer {
+class Item {
+    int cost, profit;
+    double ratio;
+    Item(int cost, int profit) {
+        this.cost = cost;
+        this.profit = profit;
+        this.ratio = (double) profit / cost;
+    }
+}
 
-    public static int maxCircularEnergy(int[] energy) {
-        int maxKadane = kadane(energy); // Maximum subarray sum without wrapping
-        int totalSum = 0;
-        for (int num : energy) totalSum += num;
+class Node {
+    int level, profit, bound, cost;
+    Node(int level, int profit, int cost) {
+        this.level = level;
+        this.profit = profit;
+        this.cost = cost;
+    }
+}
 
-        // Find minimum subarray sum to calculate circular sum
-        int minSubarraySum = kadaneMin(energy);
-        int maxCircular = totalSum - minSubarraySum; // Maximum with wrapping
+public class Main {
+    static int N, B;
+    static Item[] items;
 
-        // If all numbers are negative, maxCircular can be 0, so return maxKadane
-        return maxCircular > 0 ? Math.max(maxKadane, maxCircular) : maxKadane;
+    static int bound(Node u) {
+        if (u.cost >= B) return 0;
+        int profit_bound = u.profit;
+        int j = u.level + 1;
+        int totweight = u.cost;
+
+        while (j < N && totweight + items[j].cost <= B) {
+            totweight += items[j].cost;
+            profit_bound += items[j].profit;
+            j++;
+        }
+
+        if (j < N)
+            profit_bound += (B - totweight) * items[j].ratio;
+
+        return profit_bound;
     }
 
-    // Standard Kadane's algorithm for max subarray sum
-    private static int kadane(int[] arr) {
-        int maxSoFar = arr[0], maxEndingHere = arr[0];
-        for (int i = 1; i < arr.length; i++) {
-            maxEndingHere = Math.max(arr[i], maxEndingHere + arr[i]);
-            maxSoFar = Math.max(maxSoFar, maxEndingHere);
+    static int knapsack() {
+        Queue<Node> Q = new LinkedList<>();
+        Node u, v;
+        u = new Node(-1, 0, 0);
+        int maxProfit = 0;
+        Q.add(u);
+
+        while (!Q.isEmpty()) {
+            u = Q.poll();
+            if (u.level == N - 1) continue;
+
+            v = new Node(u.level + 1, u.profit + items[u.level + 1].profit,
+                         u.cost + items[u.level + 1].cost);
+
+            if (v.cost <= B && v.profit > maxProfit)
+                maxProfit = v.profit;
+
+            v.bound = bound(v);
+            if (v.bound > maxProfit)
+                Q.add(v);
+
+            v = new Node(u.level + 1, u.profit, u.cost);
+            v.bound = bound(v);
+            if (v.bound > maxProfit)
+                Q.add(v);
         }
-        return maxSoFar;
+        return maxProfit;
     }
 
-    // Kadane's algorithm for minimum subarray sum
-    private static int kadaneMin(int[] arr) {
-        int minSoFar = arr[0], minEndingHere = arr[0];
-        for (int i = 1; i < arr.length; i++) {
-            minEndingHere = Math.min(arr[i], minEndingHere + arr[i]);
-            minSoFar = Math.min(minSoFar, minEndingHere);
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        N = sc.nextInt();
+        B = sc.nextInt();
+        int[] cost = new int[N];
+        int[] profit = new int[N];
+        for (int i = 0; i < N; i++) cost[i] = sc.nextInt();
+        for (int i = 0; i < N; i++) profit[i] = sc.nextInt();
+
+        items = new Item[N];
+        for (int i = 0; i < N; i++)
+            items[i] = new Item(cost[i], profit[i]);
+
+        Arrays.sort(items, (a, b) -> Double.compare(b.ratio, a.ratio));
+
+        System.out.println(knapsack());
+    }
+}
+
+```
+
+## Output:
+<img width="384" height="228" alt="image" src="https://github.com/user-attachments/assets/b8b50dee-92a7-4b51-ab1b-5bcad37ce2b1" />
+
+
+
+## Result:
+The program successfully solved 0/1 Knapsack problem using branch & bound and output is verified. 
+# EX 5B Topological Sort - Khan's Algorithm
+## DATE: 20/05/2026
+## AIM:
+To write a Java program to for given constraints.
+Problem Description:
+A software development team is preparing for a product release. The release consists of multiple tasks, each dependent on other tasks being completed first. You are to determine a valid order in which all tasks can be completed. If it's not possible due to cyclic dependencies, output that the release cannot be scheduled.
+
+Each task is labeled from 0 to n-1. The dependencies are provided in the form of pairs [a, b] which means task a depends on task b.
+
+Implement a program to find a valid task execution order using topological sort.
+
+Input Format:
+
+An integer n — number of tasks.
+
+An integer m — number of dependencies.
+
+m lines follow with two integers a and b — representing a depends on b.
+
+Output Format:
+
+If a valid order exists, print the task numbers in a possible execution order (space-separated).
+
+If not, print "Release cannot be scheduled".
+
+<img width="341" height="363" alt="image" src="https://github.com/user-attachments/assets/f0355541-4f66-49da-bcd3-171a799a7c1f" />
+
+## Algorithm
+
+1. **Input:**
+
+   * Read the number of tasks `n` and the number of dependency pairs `m`.
+   * Read each dependency pair and store them in a 2D array.
+
+2. **Graph Construction:**
+
+   * Create an adjacency list to represent task dependencies.
+   * Maintain an `indegree` array to count incoming edges for each task.
+
+3. **Initialization:**
+
+   * Add all tasks with `indegree = 0` (no dependencies) to a queue.
+
+4. **Topological Sorting:**
+
+   * Repeatedly remove a task from the queue, add it to the order list, and decrease the indegree of its dependent tasks.
+   * If a dependent task’s indegree becomes 0, add it to the queue.
+
+5. **Output:**
+
+   * If all tasks are processed, print the valid order of execution.
+   * Otherwise, display “Release cannot be scheduled” if a cycle (dependency conflict) exists.
+
+
+## Program:
+```
+/*
+Program to implement Reverse a String
+Developed by: DHINESH R
+Register Number:  212223220019
+*/
+import java.util.*;
+
+public class prog {
+
+    public static List<Integer> findTaskOrder(int n, int[][] dependencies) {
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++)
+            adj.add(new ArrayList<>());
+
+        int[] indegree = new int[n];
+
+        for (int[] dep : dependencies) {
+            int a = dep[0];
+            int b = dep[1];
+            adj.get(b).add(a);
+            indegree[a]++;
         }
-        return minSoFar;
+
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < n; i++)
+            if (indegree[i] == 0)
+                q.add(i);
+
+        List<Integer> order = new ArrayList<>();
+        while (!q.isEmpty()) {
+            int curr = q.poll();
+            order.add(curr);
+            for (int next : adj.get(curr)) {
+                indegree[next]--;
+                if (indegree[next] == 0)
+                    q.add(next);
+            }
+        }
+
+        if (order.size() != n)
+            return null;
+        return order;
     }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
-        int[] energy = new int[n];
-        for (int i = 0; i < n; i++) {
-            energy[i] = sc.nextInt();
-        }
-        System.out.println(maxCircularEnergy(energy));
-    }
-}
+        int m = sc.nextInt();
 
-
-```
-
-## Output:
-
-<img width="425" height="234" alt="image" src="https://github.com/user-attachments/assets/22686834-fd7b-40ef-9110-e145238df6aa" />
-
-
-## Result:
-The program successfully Implemented and the output is verified. 
-# EX 4B Frog Jump - Dynamic Programming.
-## DATE: 12/05/2026
-## AIM:
-To write a Java program to for given constraints.
-A Frog Jump 1 or 2 steps at a time.
-Problem Statement:
-
-A frog is at the bottom of the stairs with n steps. It can jump either 1 or 2 steps at a time. Write a program to find the number of distinct ways the frog can reach the top (n-th step).
-
-Input Format:
-
-A single integer n (1 ≤ n ≤ 45) – number of steps.
- Output Format:
-
-A single integer – number of distinct ways to reach step n.
-
-## Algorithm
-
-1. Start the program and read the integer `n` (number of steps) from the user.
-2. If `n` equals 1, return 1; if `n` equals 2, return 2.
-3. Initialize two variables: `first = 1` and `second = 2` to represent ways to reach steps 1 and 2.
-4. Use a loop from 3 to `n`, updating `current = first + second`, then shift values (`first = second`, `second = current`).
-5. After the loop ends, print the value of `current` as the total number of ways the frog can reach step `n`.
- 
-
-## Program:
-```
-/*
-Program to implement Reverse a String
-Developed by: DHINESH R
-Register Number:  212223220019
-*/
-import java.util.Scanner;
-
-public class FrogJump {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int n = scanner.nextInt();
-        scanner.close();
-
-        System.out.println(countWays(n));
-    }
-
-    public static int countWays(int n) {
-        if (n == 1) return 1;
-        if (n == 2) return 2;
-
-        int first = 1; // ways to reach step 1
-        int second = 2; // ways to reach step 2
-        int current = 0;
-
-        for (int i = 3; i <= n; i++) {
-            current = first + second; // ways to reach current step
-            first = second;
-            second = current;
+        int[][] dependencies = new int[m][2];
+        for (int i = 0; i < m; i++) {
+            dependencies[i][0] = sc.nextInt();
+            dependencies[i][1] = sc.nextInt();
         }
 
-        return current;
+        List<Integer> result = findTaskOrder(n, dependencies);
+
+        if (result == null) {
+            System.out.println("Release cannot be scheduled");
+        } else {
+            for (int task : result) {
+                System.out.print(task + " ");
+            }
+        }
     }
 }
 
 ```
 
 ## Output:
+<img width="778" height="526" alt="image" src="https://github.com/user-attachments/assets/e974c893-cc88-4e0e-934d-cb727552d82a" />
 
-<img width="354" height="194" alt="image" src="https://github.com/user-attachments/assets/ae308935-4cb9-482c-b8b8-131b47fed462" />
 
 
 ## Result:
 The program successfully implemented and the expected output is verified.
-# EX 4C Coin Change Problem - Dynamic Programming.
-## DATE: 14/05/2026
+# EX 5C Graph coloring
+## DATE: 19/05/2026
 ## AIM:
 To write a Java program to for given constraints.
-You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.
+Problem Description:
+In a hilly region, several radio towers are installed to provide communication services. However, due to signal interference, two adjacent towers (i.e., in communication range of each other) must not use the same frequency channel.
 
-Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
+You are given N radio towers and their communication ranges represented as an undirected graph. Your task is to assign channels (colors) to these towers using at most M channels such that no two adjacent towers use the same channel.
 
-You may assume that you have an infinite number of each kind of coin.
+Write a program to determine if such an assignment is possible or not.
 
+Input Format:
+First line contains two integers: N (number of towers), and M (number of available frequency channels).
+
+Next line contains an integer E — number of edges representing the communication range.
+
+Next E lines contain two integers u and v — representing that tower u and tower v are within range (0-based index).
+
+Output Format:
+Print "YES" if it's possible to assign frequencies to towers such that no two adjacent towers have the same frequency.
+
+Otherwise, print "NO".
+
+<img width="182" height="440" alt="image" src="https://github.com/user-attachments/assets/b32078a2-c79d-4a25-88c4-e51144b5456f" />
 ## Algorithm
 
-1. Read the coin denominations and target amount as input.
-2. Initialize a `dp` array of size `amount + 1` with a large value (`amount + 1`), and set `dp[0] = 0`.
-3. For each amount `i` from `1` to `amount`, iterate through all coin values.
-4. If `i - coin >= 0`, update `dp[i] = min(dp[i], dp[i - coin] + 1)` to track the minimum coins needed.
-5. After filling the `dp` array, print `dp[amount]` if it’s valid; otherwise, print `-1` if the amount cannot be formed.
+1. **Input:**
 
+   * Read the number of towers `n`, available channels `m`, and number of connections `e`.
+   * Read each connection pair `(u, v)` and build an adjacency list for the graph.
+
+2. **Initialization:**
+
+   * Create an integer array `color[n]` initialized with 0 (meaning no channel assigned).
+   * Each tower (node) can be assigned a color (channel) from `1` to `m`.
+
+3. **Safety Check (`isSafe`):**
+
+   * Before assigning a channel to a tower, check all its adjacent towers.
+   * If any adjacent tower already uses the same channel, assignment is **not safe**.
+
+4. **Backtracking Solution (`solve`):**
+
+   * Try assigning each channel (1 to `m`) to the current tower.
+   * If safe, recursively assign channels to the next tower.
+   * If no valid channel exists, **backtrack** and try another combination.
+
+5. **Output:**
+
+   * If all towers can be assigned channels without conflict → print `"YES"`.
+   * Otherwise → print `"NO"`.
+   
 
 ## Program:
 ```
@@ -189,105 +367,121 @@ Register Number:  212223220019
 */
 import java.util.*;
 
-public class Solution {
-    public int coinChange(int[] coins, int amount) {
-        int max = amount + 1;
-        int[] dp = new int[amount + 1];
-        Arrays.fill(dp, max);  // Initialize with a value greater than any possible answer
-        dp[0] = 0;  // Base case: 0 coins needed to make amount 0
+public class RadioTowerChannelAssignment {
 
-        for (int i = 1; i <= amount; i++) {
-            for (int coin : coins) {
-                if (i - coin >= 0) {
-                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
-                }
+    public static boolean isSafe(List<List<Integer>> graph, int[] color, int node, int c) {
+        for (int adj : graph.get(node)) {
+            if (color[adj] == c)
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean solve(List<List<Integer>> graph, int[] color, int node, int m, int n) {
+        if (node == n)
+            return true;
+
+        for (int c = 1; c <= m; c++) {
+            if (isSafe(graph, color, node, c)) {
+                color[node] = c;
+                if (solve(graph, color, node + 1, m, n))
+                    return true;
+                color[node] = 0;
             }
         }
+        return false;
+    }
 
-        return dp[amount] > amount ? -1 : dp[amount];
+    public static boolean isColorable(List<List<Integer>> graph, int[] color, int node, int m, int n) {
+        return solve(graph, color, node, m, n);
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        Solution solution = new Solution();
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        int e = sc.nextInt();
 
-        String coinsLine = scanner.nextLine(); 
-        String amountLine = scanner.nextLine();
+        List<List<Integer>> graph = new ArrayList<>();
+        for (int i = 0; i < n; i++)
+            graph.add(new ArrayList<>());
 
-        coinsLine = coinsLine.replaceAll("[^0-9,]", ""); 
-        String[] coinsStr = coinsLine.split(",");
-        int[] coins = new int[coinsStr.length];
-        for (int i = 0; i < coinsStr.length; i++) {
-            coins[i] = Integer.parseInt(coinsStr[i]);
+        for (int i = 0; i < e; i++) {
+            int u = sc.nextInt();
+            int v = sc.nextInt();
+            graph.get(u).add(v);
+            graph.get(v).add(u);
         }
 
-        int amount = Integer.parseInt(amountLine.replaceAll("[^0-9]", ""));
-        int result = solution.coinChange(coins, amount);
-        System.out.println(result);
+        int[] color = new int[n];
 
-        scanner.close();
+        if (isColorable(graph, color, 0, m, n))
+            System.out.println("YES");
+        else
+            System.out.println("NO");
+
+        sc.close();
     }
 }
 
 ```
-
 ## Output:
-<img width="381" height="233" alt="image" src="https://github.com/user-attachments/assets/5e89c89e-b032-4cbf-be3d-96755cc94f62" />
-
-
+<img width="520" height="474" alt="image" src="https://github.com/user-attachments/assets/3417cf1d-f702-4ac7-a2dd-1b11369c84b6" />
 
 ## Result:
 The program successfully implemented and the expected output is verified.
 
-# EX 4D Longest Common SubSequence - Dynamic Programming.
-## DATE: 15/05/2026
+# EX 5D Flower Planting.
+## DATE: 20/05/2026
 ## AIM:
 To write a Java program to for given constraints.
-Given two strings text1 and text2, return the length of their longest common subsequence. If there is no common subsequence, return 0.
-A subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.
+You are given n gardens, labelled from 1 to n.
 
-For example, "ace" is a subsequence of "abcde".
-A common subsequence of two strings is a subsequence that is common to both strings.
+You also have a list called paths, where each element paths[i] = [xi, yi] represents a bidirectional road connectingthe  garden xi and garden yi.
 
-Input: text1 = "abcde", text2 = "ace" 
-Output: 3  
-Explanation: The longest common subsequence is "ace" and its length is 3.
-Constraints:
+You want to plant one flower in each garden, and there are exactly 4 types of flowers labelled as 1, 2, 3, and 4.
 
-1 <= text1.length, text2.length <= 1000
-text1 and text2 consist of only lowercase English characters.
+Your goal is to plant flowers such that:
+
+No two connected gardens (i.e., connected via a path) have the same flower type.
+
+Return any valid flower assignment as an array where:
+
+answer[i] is the flower type planted in the (i+1) ᵗʰ garden
+
+It is guaranteed that:
+
+No garden is connected to more than 3 other gardens
+
+A valid flower assignment always exists
+
+<img width="177" height="292" alt="image" src="https://github.com/user-attachments/assets/36aa40cb-1cdd-4746-b1a6-fc51ce6e96aa" />
 
 ## Algorithm
-**Procedure:**
 
 1. **Input:**
 
-   * Read two strings, `text1` and `text2`, from the user.
+   * Read the number of gardens `n` and the number of paths `m`.
+   * Read each path pair `(u, v)` that connects two gardens.
 
-2. **Initialization:**
+2. **Graph Construction:**
 
-   * Let `m` = length of `text1` and `n` = length of `text2`.
-   * Create a 2D array `dp[m+1][n+1]`, where `dp[i][j]` stores the length of the longest common subsequence (LCS) between `text1[0..i-1]` and `text2[0..j-1]`.
+   * Create an adjacency list for all gardens.
+   * For every path `(u, v)`, add each garden to the other's adjacency list.
 
-3. **Filling the DP Table:**
+3. **Initialization:**
 
-   * For each `i` from `1` to `m`:
+   * Create an integer array `flowers[n]` to store the flower type (1–4) assigned to each garden.
+   * Each garden can have one of four flower types.
 
-     * For each `j` from `1` to `n`:
+4. **Assignment Logic:**
 
-       * If characters match (`text1.charAt(i-1) == text2.charAt(j-1)`):
-         → `dp[i][j] = 1 + dp[i-1][j-1]`
-       * Else:
-         → `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`
-
-4. **Result:**
-
-   * The value `dp[m][n]` gives the **length of the longest common subsequence**.
+   * For each garden `i`, check all adjacent gardens.
+   * Mark the flower types already used by its neighbors and assign the first available flower type to garden `i`.
 
 5. **Output:**
 
-   * Print the result:
-     `"Length of Longest Common Subsequence: " + dp[m][n]`
+   * Print the final flower type assigned to each garden in order.
   
 
 ## Program:
@@ -297,89 +491,109 @@ Program to implement Reverse a String
 Developed by: DHINESH R
 Register Number:  212223220019
 */
-import java.util.Scanner;
+import java.util.*;
 
-public class Solution {
+public class GardenFlowerPlanner {
 
-    public int longestCommonSubsequence(String text1, String text2) {
-        int m = text1.length();
-        int n = text2.length();
+    public static int[] assignFlowers(int n, int[][] paths) {
+        @SuppressWarnings("unchecked")
+        List<Integer>[] adj = new ArrayList[n];
+        for (int i = 0; i < n; i++) adj[i] = new ArrayList<>();
 
-        int[][] dp = new int[m + 1][n + 1]; // dp[i][j] = LCS of text1[0..i-1] & text2[0..j-1]
+        for (int[] path : paths) {
+            adj[path[0] - 1].add(path[1] - 1);
+            adj[path[1] - 1].add(path[0] - 1);
+        }
 
-        // Fill dp table
-        for (int i = 1; i <= m; i++) {
-            for (int j = 1; j <= n; j++) {
-                if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
-                    dp[i][j] = 1 + dp[i - 1][j - 1];
-                } else {
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        int[] flowers = new int[n];
+        for (int i = 0; i < n; i++) {
+            boolean[] used = new boolean[5];
+            for (int nei : adj[i]) {
+                used[flowers[nei]] = true;
+            }
+            for (int f = 1; f <= 4; f++) {
+                if (!used[f]) {
+                    flowers[i] = f;
+                    break;
                 }
             }
         }
-
-        return dp[m][n];
+        return flowers;
     }
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        Solution sol = new Solution();
 
-        String text1 = sc.nextLine().replaceAll("\"", "");
-        String text2 = sc.nextLine().replaceAll("\"", "");
+        int n = sc.nextInt(); 
+        int m = sc.nextInt(); 
 
-        int lcsLength = sol.longestCommonSubsequence(text1, text2);
-        System.out.println("Length of Longest Common Subsequence: " + lcsLength);
+        int[][] paths = new int[m][2];
+        for (int i = 0; i < m; i++) {
+            paths[i][0] = sc.nextInt();
+            paths[i][1] = sc.nextInt();
+        }
+        int[] result = assignFlowers(n, paths);
 
-        sc.close();
+        for (int flower : result) {
+            System.out.print(flower + " ");
+        }
+        System.out.println();
     }
 }
 
 ```
 
 ## Output:
-<img width="833" height="255" alt="image" src="https://github.com/user-attachments/assets/f08d14f5-2d4e-454b-a4c0-ecbe868c1ad3" />
+<img width="454" height="426" alt="image" src="https://github.com/user-attachments/assets/22e872d3-bb54-4586-8c01-ffe010576fe5" />
 
 
 
 ## Result:
 The program successfully implemented and the expected output is verified.
 
-# EX 4E Longest Increasing Subsequence - Dynamic Programming.
-## DATE: 15/05/2026
+# EX 5E Minimum Spanning Tree -Boruvka's Algorithm
+## DATE: 20/05/2026
 ## AIM:
 To write a Java program to for given constraints.
-Given an integer array nums, return the length of the longest strictly increasing subsequence.
-Example 1:
-Input: nums = [10,9,2,5,3,7,101,18]
-Output: 4
-Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+Boruvka's Algorithm - Minimum Spanning Tree
+
+Find the MST using Boruvka's Algorithm for a weighted undirected graph.
+
+<img width="292" height="235" alt="image" src="https://github.com/user-attachments/assets/06246b27-37a9-40a8-bd7a-37a1d5187cd1" />
+
 ## Algorithm
 
 1. **Input:**
 
-   * Read the integer `n` (size of array).
-   * Read `n` integers into the array `nums`.
+   * Read number of vertices `V` and edges `E`.
+   * For each edge, read its source `src`, destination `dest`, and weight `w`.
+   * Store all edges in a list.
 
 2. **Initialization:**
 
-   * Create an array `dp[n]`, where `dp[i]` stores the **length of the longest increasing subsequence (LIS)** ending at index `i`.
-   * Initialize all values of `dp` to `1`, since each element is an LIS of length `1` by itself.
-   * Initialize `maxLen = 1` to keep track of the overall maximum LIS length.
+   * Set up a `parent[]` array for Disjoint Set Union (DSU).
+   * Initially, each vertex is its own parent.
+   * Initialize `numTrees = V` (number of connected components) and `MSTweight = 0`.
 
-3. **Dynamic Programming Logic:**
+3. **Finding Cheapest Edges:**
 
-   * For each element `nums[i]` (from index `1` to `n-1`):
+   * For every iteration (while more than one tree exists):
 
-     * Compare it with all previous elements `nums[j]` (where `j < i`).
-     * If `nums[i] > nums[j]`, it means we can extend the subsequence ending at `j`.
-       → Update `dp[i] = max(dp[i], dp[j] + 1)`
-   * After each iteration, update `maxLen = max(maxLen, dp[i])`.
+     * Initialize an array `cheapest[]` to store the minimum-cost edge for each component.
+     * For each edge, find the sets of its two vertices.
+     * Update `cheapest` for both sets if the current edge has a smaller weight.
 
-4. **Output:**
+4. **Building the MST:**
 
-   * Print `maxLen`, which represents the **length of the longest increasing subsequence**.
- 
+   * For each vertex, pick its `cheapest` edge (if any).
+   * If the two endpoints belong to different sets, include the edge in the MST, print it, and merge the sets using `union()`.
+   * Decrease `numTrees` after each successful merge.
+
+5. **Output:**
+
+   * Continue until only one tree (MST) remains.
+   * Print each chosen edge and finally display the **Total Weight of MST**.
+   
 
 ## Program:
 ```
@@ -390,50 +604,90 @@ Register Number:  212223220019
 */
 import java.util.*;
 
-public class LongestIncreasingSubsequence {
+public class BoruvkaMST {
+    static int[] parent;
 
-    public static int lengthOfLIS(int[] nums) {
-        if (nums == null || nums.length == 0) return 0;
+    static int find(int i) {
+        if (parent[i] != i)
+            parent[i] = find(parent[i]);
+        return parent[i];
+    }
 
-        int n = nums.length;
-        int[] dp = new int[n];  // dp[i] = length of LIS ending at nums[i]
-        Arrays.fill(dp, 1);     // Each element is a LIS of length 1 by itself
+    static void union(int x, int y) {
+        parent[find(x)] = find(y);
+    }
 
-        int maxLen = 1;
+    static int boruvkaMST(int V, List<Edge> edges) {
+        parent = new int[V];
+        int[] cheapest = new int[V];
+        int numTrees = V;
+        int MSTweight = 0;
 
-        for (int i = 1; i < n; i++) {
-            for (int j = 0; j < i; j++) {
-                if (nums[i] > nums[j]) {
-                    dp[i] = Math.max(dp[i], dp[j] + 1);
+        for (int v = 0; v < V; v++)
+            parent[v] = v;
+
+        while (numTrees > 1) {
+            Arrays.fill(cheapest, -1);
+
+            for (int i = 0; i < edges.size(); i++) {
+                int set1 = find(edges.get(i).src);
+                int set2 = find(edges.get(i).dest);
+                if (set1 == set2) continue;
+
+                if (cheapest[set1] == -1 || edges.get(i).weight < edges.get(cheapest[set1]).weight)
+                    cheapest[set1] = i;
+
+                if (cheapest[set2] == -1 || edges.get(i).weight < edges.get(cheapest[set2]).weight)
+                    cheapest[set2] = i;
+            }
+
+            for (int i = 0; i < V; i++) {
+                if (cheapest[i] != -1) {
+                    Edge e = edges.get(cheapest[i]);
+                    int set1 = find(e.src);
+                    int set2 = find(e.dest);
+
+                    if (set1 == set2) continue;
+
+                    MSTweight += e.weight;
+                    System.out.println("Edge: " + e.src + "-" + e.dest + " Weight: " + e.weight);
+                    union(set1, set2);
+                    numTrees--;
                 }
             }
-            maxLen = Math.max(maxLen, dp[i]);
         }
-
-        return maxLen;
+        return MSTweight;
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
-        int n = scanner.nextInt();
-        int[] nums = new int[n];
+        int V = sc.nextInt();
+        int E = sc.nextInt();
 
-        for (int i = 0; i < n; i++) {
-            nums[i] = scanner.nextInt();
+        List<Edge> edges = new ArrayList<>();
+        for (int i = 0; i < E; i++) {
+            edges.add(new Edge(sc.nextInt(), sc.nextInt(), sc.nextInt()));
         }
 
-        int result = lengthOfLIS(nums);
-        System.out.println("Length of Longest Increasing Subsequence: " + result);
+        int totalWeight = boruvkaMST(V, edges);
+        System.out.println("Total Weight of MST: " + totalWeight);
 
-        scanner.close();
+        sc.close();
+    }
+}
+
+class Edge {
+    int src, dest, weight;
+    Edge(int s, int d, int w) {
+        src = s; dest = d; weight = w;
     }
 }
 
 ```
 
 ## Output:
-<img width="812" height="257" alt="image" src="https://github.com/user-attachments/assets/520c0acf-b436-422b-9aff-b9e07ce4377b" />
+<img width="736" height="485" alt="image" src="https://github.com/user-attachments/assets/7e88ce2d-fabe-455f-8fc9-8ec6622ab5e3" />
 
 
 
